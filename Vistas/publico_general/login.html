@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jean Trainer - Iniciar Sesión</title>
+    <style>
+        /* MISMO CSS QUE TIENES */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            display: flex;
+            background-color: #111;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            min-height: 600px;
+            border: 2px solid #333;
+        }
+        
+        .logo-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            border-right: 2px solid #FFD700;
+        }
+        
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            opacity: 0.1;
+        }
+        
+        .logo-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+            z-index: 1;
+            color: #FFD700;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .logo-section h2 {
+            font-size: 1.3rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            z-index: 1;
+            text-align: center;
+            color: #ccc;
+            max-width: 80%;
+            line-height: 1.6;
+        }
+        
+        .logo-image {
+            width: 100%;
+            max-width: 350px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 1;
+            border: 2px solid #FFD700;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-section h1 {
+            color: #FFD700;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background-color: #000;
+            border: 2px solid #333;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+        
+        .form-group input:focus {
+            border-color: #FFD700;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+        
+        .form-group label {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #aaa;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            background-color: #111;
+            padding: 0 5px;
+        }
+        
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #FFD700;
+            font-weight: 600;
+        }
+        
+        .btn-login {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-login:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .forgot-password a {
+            color: #FFD700;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .register-link {
+            text-align: center;
+            margin-top: 30px;
+            color: #ccc;
+        }
+        
+        .register-link a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .success-message {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .trainer-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            z-index: 1;
+            color: #FFD700;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .remember-me input {
+            margin-right: 10px;
+            accent-color: #FFD700;
+        }
+        
+        .remember-me label {
+            color: #ccc;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            
+            .logo-section {
+                padding: 30px 20px;
+                min-height: 250px;
+                border-right: none;
+                border-bottom: 2px solid #FFD700;
+            }
+            
+            .logo-section h1 {
+                font-size: 2rem;
+            }
+            
+            .logo-section h2 {
+                font-size: 1.1rem;
+            }
+            
+            .form-section {
+                padding: 40px 30px;
+            }
+            
+            .logo-image {
+                max-width: 250px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .logo-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .trainer-icon {
+                font-size: 3rem;
+            }
+        }
+        
+        .message-display {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .success-message {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-section">
+            <div class="trainer-icon">
+                <i class="fas fa-dumbbell"></i>
+            </div>
+            <h1>Jean Trainer</h1>
+            <h2>Sistema de Gestión de Entrenamiento</h2>
+            <img src="https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Entrenamiento personal" class="logo-image">
+        </div>
+        
+        <div class="form-section">
+            <h1>Iniciar Sesión</h1>
+            
+            <div id="messageContainer"></div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="email" id="email" name="email" placeholder=" " required>
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                </div>
+                
+                <div class="form-group">
+                    <input type="password" id="password" name="password" placeholder=" " required>
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Contraseña
+                    </label>
+                </div>
+                
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">Recordar mis datos</label>
+                </div>
+                
+                <button type="submit" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+                
+                <div class="forgot-password">
+                    <a href="recuperar.html">¿Olvidaste tu contraseña?</a>
+                </div>
+            </form>
+            
+            <div class="register-link">
+                <p>¿No tienes una cuenta?</p>
+                <a href="registro.html">Regístrate ahora</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { loginUser, validateEmail } from './supabaseClient.js';
+        
+        function showMessage(text, type = 'error') {
+            const messageContainer = document.getElementById('messageContainer');
+            if (!messageContainer) return;
+            
+            messageContainer.innerHTML = `
+                <div class="message-display ${type}-message">
+                    ${text}
+                </div>
+            `;
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedEmail = localStorage.getItem('userEmail');
+            const rememberCheckbox = document.getElementById('remember');
+            
+            if (savedEmail && rememberCheckbox) {
+                document.getElementById('email').value = savedEmail;
+                rememberCheckbox.checked = true;
+            }
+        });
+        
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const remember = document.getElementById('remember').checked;
+            
+            if (!email || !password) {
+                showMessage('Completa todos los campos', 'error');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('Email inválido', 'error');
+                return;
+            }
+            
+            if (remember) {
+                localStorage.setItem('userEmail', email);
+            } else {
+                localStorage.removeItem('userEmail');
+            }
+            
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalHTML = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Iniciando sesión...';
+            submitBtn.disabled = true;
+            
+            try {
+                const result = await loginUser(email, password);
+                
+                if (!result.success) {
+                    showMessage(result.error, 'error');
+                    submitBtn.innerHTML = originalHTML;
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                const userName = result.profile?.nombre || result.user.email.split('@')[0];
+                const userRol = result.rol || 'usuario';
+                
+                console.log('✅ Login exitoso - Usuario:', userName, 'Rol:', userRol);
+                showMessage(`¡Bienvenido, ${userName}!`, 'success');
+                
+                // REDIRECCIÓN SEGÚN EL ROL
+                setTimeout(() => {
+                    if (userRol === 'admin') {
+                        console.log('🚀 Redirigiendo a dashboard_admin.html');
+                        window.location.href = 'dashboard_admin.html';
+                    } else if (userRol === 'entrenador') {
+                        console.log('🚀 Redirigiendo a dashboard_entrenador.html');
+                        window.location.href = 'dashboard_entrenador.html';
+                    } else if (userRol === 'usuario'){
+                        console.log('🚀 Redirigiendo a dashboard.html');
+                        window.location.href = 'dashboard.html';
+                    }
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Error inesperado', 'error');
+                submitBtn.innerHTML = originalHTML;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

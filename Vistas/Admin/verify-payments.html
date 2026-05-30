@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Verificar Pagos - Jean Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #000;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            border-bottom: 2px solid #FFD700;
+        }
+        .navbar {
+            height: 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .back-btn {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .back-btn:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+        }
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 30px 50px;
+        }
+        .page-title {
+            font-size: 2.5rem;
+            color: #FFD700;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .filters {
+            background-color: #111;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        .filter-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .filter-select {
+            width: 100%;
+            padding: 10px 15px;
+            background-color: #222;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        .payments-table {
+            background-color: #111;
+            border-radius: 15px;
+            overflow-x: auto;
+            border: 1px solid #333;
+        }
+        .table-header {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 1.5fr;
+            background-color: #FFD700;
+            color: #000;
+            font-weight: 700;
+            padding: 15px 20px;
+            min-width: 900px;
+        }
+        .table-row {
+            display: grid;
+            grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 1fr 1.5fr;
+            padding: 15px 20px;
+            border-bottom: 1px solid #333;
+            align-items: center;
+            min-width: 900px;
+        }
+        .table-row:hover {
+            background-color: rgba(255, 215, 0, 0.05);
+        }
+        .status-pendiente {
+            background-color: rgba(255, 165, 0, 0.2);
+            color: #FFA500;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-verificado {
+            background-color: rgba(0, 128, 0, 0.2);
+            color: #00FF00;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .status-rechazado {
+            background-color: rgba(255, 0, 0, 0.2);
+            color: #FF4444;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .btn-action {
+            background: none;
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin: 2px;
+        }
+        .btn-action:hover {
+            background-color: #FFD700;
+            color: #000;
+        }
+        .counter {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #FFD700;
+        }
+        .counter span {
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #FFD700;
+        }
+        .loading i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .period-badge {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+            color: #FFD700;
+        }
+        .plan-badge {
+            background: rgba(255, 215, 0, 0.15);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            display: inline-block;
+            margin-top: 4px;
+            color: #FFD700;
+        }
+        @media (max-width: 1200px) {
+            .table-header, .table-row {
+                grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr;
+                min-width: 700px;
+            }
+            .mobile-hidden {
+                display: none;
+            }
+        }
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .main-content { padding: 100px 20px 30px; }
+            .page-title { font-size: 2rem; }
+            .table-header, .table-row {
+                grid-template-columns: 2fr 1.5fr 1fr;
+                min-width: 500px;
+                padding: 10px;
+            }
+            .filters { flex-direction: column; }
+            .filter-group { min-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="../publico_general/dashboard_admin.html">Athlex</a></div>
+            <button class="back-btn" onclick="window.location.href='../publico_general/dashboard_admin.html'">
+                <i class="fas fa-arrow-left"></i> Regresar
+            </button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">Verificar Pagos</h1>
+        
+        <div class="counter">
+            Pagos pendientes: <span id="pendingCount">0</span>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="filterStatus">Estado</label>
+                <select id="filterStatus" class="filter-select">
+                    <option value="all">Todos</option>
+                    <option value="pendiente">Pendiente</option>
+                    <option value="verificado">Verificado</option>
+                    <option value="rechazado">Rechazado</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterMonth">Mes</label>
+                <select id="filterMonth" class="filter-select">
+                    <option value="all">Todos los meses</option>
+                    <option value="01">Enero</option>
+                    <option value="02">Febrero</option>
+                    <option value="03">Marzo</option>
+                    <option value="04">Abril</option>
+                    <option value="05">Mayo</option>
+                    <option value="06">Junio</option>
+                    <option value="07">Julio</option>
+                    <option value="08">Agosto</option>
+                    <option value="09">Septiembre</option>
+                    <option value="10">Octubre</option>
+                    <option value="11">Noviembre</option>
+                    <option value="12">Diciembre</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="filterType">Tipo de Pago</label>
+                <select id="filterType" class="filter-select">
+                    <option value="all">Todos</option>
+                    <option value="mensualidad">Mensualidad</option>
+                    <option value="inscripcion">Inscripción</option>
+                    <option value="renovacion">Renovación</option>
+                    <option value="extra">Extra</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="payments-table">
+            <div class="table-header">
+                <div>Usuario / Plan</div>
+                <div>Monto / Período</div>
+                <div>Fecha</div>
+                <div>Método</div>
+                <div>Tipo</div>
+                <div>Estado</div>
+                <div>Acciones</div>
+            </div>
+            <div id="paymentsList">
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Cargando pagos...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        // Configuración Supabase
+        const supabaseUrl = 'https://iketdpkxyojqxruzzrgy.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZXRkcGt4eW9qcXhydXp6cmd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5ODMwNTcsImV4cCI6MjA4NTU1OTA1N30.974zKW2EMNMuCndTC6_g5zZP3mN2XZLlDsmsz8602Lk';
+        
+        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+                autoRefreshToken: true,
+                persistSession: true,
+                detectSessionInUrl: true
+            }
+        });
+
+        // Variables globales
+        let allPayments = [];
+        let currentUser = null;
+
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await checkAdminAccess();
+                await loadPayments();
+                setupFilters();
+            } catch (error) {
+                console.error('Error:', error);
+                showError('Error cargando la página: ' + error.message);
+            }
+        });
+
+        async function checkAdminAccess() {
+            try {
+                const { data: { user }, error: userError } = await supabase.auth.getUser();
+                
+                if (userError || !user) {
+                    console.log('No hay usuario autenticado');
+                    window.location.href = '../publico_general/login.html';
+                    return;
+                }
+
+                currentUser = user;
+                
+                // Verificar si es admin
+                const { data: isAdmin, error: adminError } = await supabase
+                    .rpc('es_admin', { user_id: user.id });
+                
+                if (adminError) {
+                    console.error('Error verificando admin:', adminError);
+                    throw adminError;
+                }
+
+                if (!isAdmin) {
+                    alert('❌ Acceso denegado. Solo administradores pueden verificar pagos.');
+                    window.location.href = '../publico_general/dashboard.html';
+                    return;
+                }
+
+                console.log('✅ Admin autenticado:', user.email);
+            } catch (error) {
+                console.error('Error en checkAdminAccess:', error);
+                throw error;
+            }
+        }
+
+        async function loadPayments() {
+            try {
+                const paymentsList = document.getElementById('paymentsList');
+                paymentsList.innerHTML = '<div class="loading"><i class="fas fa-spinner"></i><p>Cargando pagos...</p></div>';
+                
+                // Llamar a obtener_pagos sin parámetro para obtener todos los pagos
+                const { data, error } = await supabase
+                    .rpc('obtener_pagos', { p_estado: null });
+                
+                if (error) {
+                    console.error('Error en RPC:', error);
+                    throw error;
+                }
+                
+                allPayments = data || [];
+                console.log(`✅ Cargados ${allPayments.length} pagos`);
+                
+                updatePendingCount();
+                displayPayments(allPayments);
+            } catch (error) {
+                console.error('Error cargando pagos:', error);
+                
+                // Intentar consulta directa como fallback
+                try {
+                    console.log('Intentando consulta directa como fallback...');
+                    const { data: directData, error: directError } = await supabase
+                        .from('pagos')
+                        .select(`
+                            id,
+                            monto,
+                            fecha_pago,
+                            periodo_dias,
+                            metodo_pago,
+                            tipo_pago,
+                            estado,
+                            telefono_emisor,
+                            banco_emisor,
+                            numero_referencia,
+                            verificado_en,
+                            notas,
+                            plan_nombre,
+                            usuarios: id_usuario (
+                                nombre,
+                                apellido,
+                                correo
+                            )
+                        `)
+                        .order('fecha_pago', { ascending: false });
+                    
+                    if (directError) throw directError;
+                    
+                    allPayments = directData.map(p => ({
+                        id: p.id,
+                        usuario_nombre: p.usuarios ? `${p.usuarios.nombre} ${p.usuarios.apellido}`.trim() : 'N/A',
+                        usuario_correo: p.usuarios?.correo || 'N/A',
+                        monto: p.monto,
+                        fecha_pago: p.fecha_pago,
+                        periodo_dias: p.periodo_dias,
+                        metodo_pago: p.metodo_pago,
+                        tipo_pago: p.tipo_pago,
+                        estado: p.estado,
+                        telefono_emisor: p.telefono_emisor,
+                        banco_emisor: p.banco_emisor,
+                        numero_referencia: p.numero_referencia,
+                        verificado_en: p.verificado_en,
+                        notas: p.notas,
+                        plan_nombre: p.plan_nombre
+                    }));
+                    
+                    updatePendingCount();
+                    displayPayments(allPayments);
+                } catch (fallbackError) {
+                    console.error('Error en fallback:', fallbackError);
+                    showError('No se pudieron cargar los pagos. Verifica la conexión.');
+                }
+            }
+        }
+
+        function displayPayments(payments) {
+            const paymentsList = document.getElementById('paymentsList');
+            
+            if (!payments || payments.length === 0) {
+                paymentsList.innerHTML = '<div class="table-row" style="text-align: center; justify-content: center; grid-column: span 7;">No hay pagos registrados</div>';
+                return;
+            }
+            
+            let html = '';
+            
+            payments.forEach(payment => {
+                try {
+                    const fecha = payment.fecha_pago ? new Date(payment.fecha_pago).toLocaleDateString('es-ES') : 'N/A';
+                    const monto = payment.monto ? `$${parseFloat(payment.monto).toFixed(2)}` : '$0.00';
+                    const periodo = payment.periodo_dias || 30;
+                    const planNombre = payment.plan_nombre || 'No especificado';
+                    
+                    let metodoDisplay = payment.metodo_pago || 'N/A';
+                    if (metodoDisplay === 'pago_movil') metodoDisplay = '📱 Pago Móvil';
+                    else if (metodoDisplay === 'transferencia') metodoDisplay = '🏦 Transferencia';
+                    else if (metodoDisplay === 'efectivo') metodoDisplay = '💵 Efectivo';
+                    else if (metodoDisplay === 'tarjeta') metodoDisplay = '💳 Tarjeta';
+                    
+                    let estadoClass = '';
+                    let estadoText = '';
+                    switch(payment.estado) {
+                        case 'pendiente': 
+                            estadoClass = 'status-pendiente'; 
+                            estadoText = '⏳ Pendiente'; 
+                            break;
+                        case 'verificado': 
+                            estadoClass = 'status-verificado'; 
+                            estadoText = '✅ Verificado'; 
+                            break;
+                        case 'rechazado': 
+                            estadoClass = 'status-rechazado'; 
+                            estadoText = '❌ Rechazado'; 
+                            break;
+                        default:
+                            estadoClass = 'status-pendiente';
+                            estadoText = '⏳ Pendiente';
+                    }
+                    
+                    html += `
+                        <div class="table-row" data-id="${payment.id}" data-estado="${payment.estado || 'pendiente'}">
+                            <div>
+                                <strong>${escapeHtml(payment.usuario_nombre || 'N/A')}</strong>
+                                <div style="color: #aaa; font-size: 0.7rem;">${escapeHtml(payment.usuario_correo || '')}</div>
+                                <div class="plan-badge">
+                                    <i class="fas fa-tag"></i> ${escapeHtml(planNombre)}
+                                </div>
+                            </div>
+                            <div>
+                                <strong style="color: #FFD700;">${monto}</strong>
+                                <div style="color: #aaa; font-size: 0.7rem;">
+                                    <i class="fas fa-calendar"></i> ${periodo} días
+                                </div>
+                            </div>
+                            <div>${fecha}</div>
+                            <div>${metodoDisplay}</div>
+                            <div>${payment.tipo_pago || 'N/A'}</div>
+                            <div><span class="${estadoClass}">${estadoText}</span></div>
+                            <div>
+                                ${payment.estado === 'pendiente' ? `
+                                    <button class="btn-action" onclick="window.verifyPayment('${payment.id}')">
+                                        <i class="fas fa-check"></i> Verificar
+                                    </button>
+                                    <button class="btn-action" onclick="window.rejectPayment('${payment.id}')">
+                                        <i class="fas fa-times"></i> Rechazar
+                                    </button>
+                                ` : `
+                                    <button class="btn-action" onclick="window.viewPaymentDetails('${payment.id}')">
+                                        <i class="fas fa-eye"></i> Detalles
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                } catch (e) {
+                    console.error('Error mostrando pago:', e);
+                }
+            });
+            
+            paymentsList.innerHTML = html;
+        }
+        
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function updatePendingCount() {
+            const pendientes = allPayments.filter(p => p.estado === 'pendiente').length;
+            document.getElementById('pendingCount').textContent = pendientes;
+        }
+
+        window.verifyPayment = async function(paymentId) {
+            if (!confirm('✅ ¿Verificar este pago?\n\nSe extenderá la membresía automáticamente con el plan seleccionado.')) {
+                return;
+            }
+            
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) throw new Error('No hay sesión activa');
+
+                const { data, error } = await supabase
+                    .rpc('verificar_pago', {
+                        p_pago_id: paymentId,
+                        p_verificado_por: user.id
+                    });
+                
+                if (error) throw error;
+                
+                if (data?.success) {
+                    alert(`✅ ${data.message || 'Pago verificado exitosamente'}`);
+                    await loadPayments();
+                } else {
+                    throw new Error(data?.error || 'Error verificando pago');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`❌ Error: ${error.message}`);
+            }
+        };
+
+        window.rejectPayment = async function(paymentId) {
+            const reason = prompt('📝 Motivo del rechazo:');
+            if (!reason || reason.trim() === '') {
+                alert('Debes ingresar un motivo');
+                return;
+            }
+            
+            if (!confirm('❌ ¿Estás seguro de rechazar este pago?')) return;
+            
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) throw new Error('No hay sesión activa');
+
+                const { data, error } = await supabase
+                    .rpc('rechazar_pago', {
+                        p_pago_id: paymentId,
+                        p_verificado_por: user.id,
+                        p_notas: reason.trim()
+                    });
+                
+                if (error) throw error;
+                
+                if (data?.success) {
+                    alert(`❌ ${data.message || 'Pago rechazado'}`);
+                    await loadPayments();
+                } else {
+                    throw new Error(data?.error || 'Error rechazando pago');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert(`❌ Error: ${error.message}`);
+            }
+        };
+
+        window.viewPaymentDetails = function(paymentId) {
+            const payment = allPayments.find(p => p.id === paymentId);
+            if (!payment) {
+                alert('Pago no encontrado');
+                return;
+            }
+            
+            let detalles = `📋 DETALLES DEL PAGO\n══════════════════════════\n\n`;
+            detalles += `👤 USUARIO: ${payment.usuario_nombre || 'N/A'}\n`;
+            detalles += `📧 EMAIL: ${payment.usuario_correo || 'N/A'}\n`;
+            detalles += `🏷️ PLAN: ${payment.plan_nombre || 'No especificado'}\n`;
+            detalles += `💰 MONTO: $${payment.monto ? parseFloat(payment.monto).toFixed(2) : '0.00'}\n`;
+            detalles += `📅 PERÍODO: ${payment.periodo_dias || 30} días\n`;
+            
+            let metodo = payment.metodo_pago || 'N/A';
+            if (metodo === 'pago_movil') {
+                detalles += `📱 MÉTODO: Pago Móvil\n`;
+                detalles += `📞 Teléfono: ${payment.telefono_emisor || 'N/A'}\n`;
+                detalles += `🏦 Banco: ${payment.banco_emisor || 'N/A'}\n`;
+            } else if (metodo === 'transferencia') {
+                detalles += `🏦 MÉTODO: Transferencia\n`;
+                detalles += `🔢 Referencia: ${payment.numero_referencia || 'N/A'}\n`;
+            } else if (metodo === 'efectivo') {
+                detalles += `💵 MÉTODO: Efectivo\n`;
+            } else if (metodo === 'tarjeta') {
+                detalles += `💳 MÉTODO: Tarjeta\n`;
+            }
+            
+            detalles += `📋 TIPO: ${payment.tipo_pago || 'N/A'}\n`;
+            detalles += `✅ ESTADO: ${(payment.estado || 'pendiente').toUpperCase()}\n`;
+            
+            if (payment.verificado_en) {
+                const fechaVerif = new Date(payment.verificado_en).toLocaleString('es-ES');
+                detalles += `\n✅ VERIFICADO: ${fechaVerif}\n`;
+            }
+            
+            if (payment.notas) {
+                detalles += `\n📝 NOTAS: ${payment.notas}\n`;
+            }
+            
+            alert(detalles);
+        };
+
+        function setupFilters() {
+            const filterStatus = document.getElementById('filterStatus');
+            const filterMonth = document.getElementById('filterMonth');
+            const filterType = document.getElementById('filterType');
+            
+            filterStatus.addEventListener('change', applyFilters);
+            filterMonth.addEventListener('change', applyFilters);
+            filterType.addEventListener('change', applyFilters);
+        }
+
+        function applyFilters() {
+            let filtered = [...allPayments];
+            
+            const statusFilter = document.getElementById('filterStatus').value;
+            const monthFilter = document.getElementById('filterMonth').value;
+            const typeFilter = document.getElementById('filterType').value;
+            
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(p => p.estado === statusFilter);
+            }
+            if (monthFilter !== 'all') {
+                filtered = filtered.filter(p => {
+                    if (!p.fecha_pago) return false;
+                    try {
+                        const month = new Date(p.fecha_pago).getMonth() + 1;
+                        return month.toString().padStart(2, '0') === monthFilter;
+                    } catch {
+                        return false;
+                    }
+                });
+            }
+            if (typeFilter !== 'all') {
+                filtered = filtered.filter(p => p.tipo_pago === typeFilter);
+            }
+            
+            displayPayments(filtered);
+        }
+
+        function showError(message) {
+            const paymentsList = document.getElementById('paymentsList');
+            paymentsList.innerHTML = `
+                <div class="table-row" style="text-align: center; color: #ff4444; justify-content: center; grid-column: span 7;">
+                    <i class="fas fa-exclamation-triangle"></i> ${message}
+                </div>
+            `;
+        }
+
+        // Exponer funciones al objeto window
+        window.verifyPayment = window.verifyPayment;
+        window.rejectPayment = window.rejectPayment;
+        window.viewPaymentDetails = window.viewPaymentDetails;
+    </script>
+</body>
+</html>

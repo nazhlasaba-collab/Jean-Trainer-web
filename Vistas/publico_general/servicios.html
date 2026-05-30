@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Servicios - Jean Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Menú lateral (sidebar) */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: #000;
+            z-index: 2000;
+            transition: right 0.3s ease;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.5);
+            padding: 80px 30px 30px;
+        }
+
+        .sidebar.active {
+            right: 0;
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1999;
+            display: none;
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .sidebar-close {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            color: #FFD700;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 25px;
+        }
+
+        .sidebar-menu a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: 600;
+            transition: color 0.3s;
+            display: block;
+            padding: 10px 0;
+            border-bottom: 1px solid #333;
+        }
+
+        .sidebar-menu a:hover {
+            color: #FFD700;
+        }
+
+        .sidebar-action {
+            display: block;
+            width: 100%;
+            background-color: #FFD700;
+            color: #000;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 30px;
+            text-align: center;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-action:hover {
+            background-color: #FFC400;
+        }
+
+        /* Header & Navbar */
+        header {
+            background-color: #1b1a1a;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .navbar {
+            height: 80px;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .links a {
+            text-decoration: none;
+            color: #FFD700;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .links a:hover {
+            color: #fff;
+        }
+
+        .links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: #FFD700;
+            left: 0;
+            bottom: -5px;
+            transition: width 0.3s;
+        }
+
+        .links a:hover::after {
+            width: 100%;
+        }
+
+        .action_btn {
+            background-color: #FFD700;
+            color: #000;
+            padding: 0.8rem 2rem;
+            border: none;
+            outline: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .action_btn:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+        }
+
+        .toggle_btn {
+            color: #FFD700;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Contenido principal */
+        .main-content {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Hero */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            max-width: 800px;
+            margin: 30px auto 0;
+        }
+
+        /* Cards de deportes */
+        .sports-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: #FFD700;
+        }
+
+        .sports-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .sport-card {
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 20px;
+            padding: 40px 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .sport-card:hover {
+            transform: translateY(-10px);
+            border-color: #FFD700;
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .sport-icon {
+            width: 90px;
+            height: 90px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+        }
+
+        .sport-icon i {
+            font-size: 3rem;
+            color: #FFD700;
+        }
+
+        .sport-card h3 {
+            font-size: 1.8rem;
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+
+        .sport-card p {
+            color: #ccc;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .exercises-list {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .exercises-list h4 {
+            color: #FFD700;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .exercises-list ul {
+            list-style: none;
+        }
+
+        .exercises-list li {
+            padding: 6px 0;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .exercises-list li i {
+            color: #FFD700;
+            font-size: 0.7rem;
+        }
+
+        /* Sección de personalización */
+        .custom-section {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(255, 215, 0, 0.02));
+            border-radius: 20px;
+            padding: 50px;
+            margin-bottom: 60px;
+            text-align: center;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .custom-section h2 {
+            color: #FFD700;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        .custom-section p {
+            color: #ccc;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            font-size: 1.1rem;
+        }
+
+        .custom-features {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .custom-feature {
+            text-align: center;
+        }
+
+        .custom-feature i {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+
+        .custom-feature h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .custom-feature p {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin: 0;
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            border-radius: 20px;
+        }
+
+        .cta-section h2 {
+            color: #FFD700;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            color: #ccc;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            background-color: #FFD700;
+            color: #000;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        footer {
+            background-color: #111;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #333;
+            margin-top: 60px;
+        }
+
+        footer p {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        footer .social-links {
+            margin-top: 15px;
+        }
+
+        footer .social-links a {
+            color: #FFD700;
+            font-size: 1.3rem;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+        }
+
+        footer .social-links a:hover {
+            transform: translateY(-3px);
+            color: #fff;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .links, .action_btn {
+                display: none;
+            }
+            .toggle_btn {
+                display: block;
+            }
+            .sports-grid {
+                grid-template-columns: 1fr;
+            }
+            .custom-features {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            .custom-features {
+                grid-template-columns: 1fr;
+            }
+            .navbar {
+                padding: 0 15px;
+            }
+            .sidebar {
+                width: 250px;
+                right: -250px;
+            }
+            .custom-section {
+                padding: 30px 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo {
+                font-size: 1.4rem;
+            }
+            .toggle_btn {
+                font-size: 1.5rem;
+            }
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="sidebar" id="sidebar">
+        <button class="sidebar-close" id="sidebarClose">
+            <i class="fas fa-times"></i>
+        </button>
+        <ul class="sidebar-menu">
+            <li><a href="inicio.html">Inicio</a></li>
+            <li><a href="servicios.html">Servicios</a></li>
+            <li><a href="sobremi.html">Sobre mí</a></li>
+            <li><a href="registro.html">Regístrate</a></li>
+        </ul>
+        <a href="login.html" class="sidebar-action">Inicio de sesión</a>
+    </div>
+
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="inicio.html">Athlex</a></div>
+            <ul class="links">
+                <li><a href="inicio.html">Inicio</a></li>
+                <li><a href="servicios.html">Servicios</a></li>
+                <li><a href="sobremi.html">Sobre mí</a></li>
+                <li><a href="registro.html">Regístrate</a></li>
+            </ul>
+            <a href="login.html" class="action_btn">Inicio de sesión</a>
+            <div class="toggle_btn" id="toggleBtn">
+                <i class="fa-solid fa-bars"></i>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <div class="hero-section">
+                <h1 class="hero-title">Servicios de Entrenamiento</h1>
+                <p class="hero-subtitle">Programas diseñados exclusivamente para ti, adaptados a tus objetivos, nivel y disponibilidad</p>
+            </div>
+
+            <!-- Ejercicios por deporte -->
+            <div class="sports-section">
+                <h2 class="section-title">Entrenamiento Híbrido</h2>
+                <div class="sports-grid">
+                    <!-- Crossfit -->
+                    <div class="sport-card">
+                        <div class="sport-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <h3>Crossfit</h3>
+                        <p>Entrenamiento funcional de alta intensidad para desarrollar fuerza, resistencia y condición física integral.</p>
+                        <div class="exercises-list">
+                            <h4><i class="fas fa-dumbbell"></i> Ejercicios destacados:</h4>
+                            <ul>
+                                <li><i class="fas fa-circle"></i> Squat (Sentadillas)</li>
+                                <li><i class="fas fa-circle"></i> Deadlift (Peso muerto)</li>
+                                <li><i class="fas fa-circle"></i> Power Clean</li>
+                                <li><i class="fas fa-circle"></i> Snatch</li>
+                                <li><i class="fas fa-circle"></i> Pull-ups & Muscle-ups</li>
+                                <li><i class="fas fa-circle"></i> Handstand Push-ups</li>
+                                <li><i class="fas fa-circle"></i> WODs (Fran, Helen, Murph)</li>
+                                <li><i class="fas fa-circle"></i> Double Unders</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Running -->
+                    <div class="sport-card">
+                        <div class="sport-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <h3>Running</h3>
+                        <p>Preparación para corredores de todas las distancias, desde 5K hasta maratón, con enfoque en técnica y resistencia.</p>
+                        <div class="exercises-list">
+                            <h4><i class="fas fa-road"></i> Distancias y pruebas:</h4>
+                            <ul>
+                                <li><i class="fas fa-circle"></i> 1 km - 3 km - 5 km</li>
+                                <li><i class="fas fa-circle"></i> 10 km</li>
+                                <li><i class="fas fa-circle"></i> Media Maratón (21.1 km)</li>
+                                <li><i class="fas fa-circle"></i> Maratón (42.2 km)</li>
+                                <li><i class="fas fa-circle"></i> Test de Cooper (12 min)</li>
+                                <li><i class="fas fa-circle"></i> Entrenamiento de velocidad</li>
+                                <li><i class="fas fa-circle"></i> Trabajo de técnica de carrera</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- HYROX -->
+                    <div class="sport-card">
+                        <div class="sport-icon">
+                            <i class="fas fa-medal"></i>
+                        </div>
+                        <h3>HYROX</h3>
+                        <p>Preparación específica para competiciones HYROX, combinando fuerza funcional y resistencia cardiovascular.</p>
+                        <div class="exercises-list">
+                            <h4><i class="fas fa-stopwatch"></i> Estaciones HYROX:</h4>
+                            <ul>
+                                <li><i class="fas fa-circle"></i> SkiErg (1000 m)</li>
+                                <li><i class="fas fa-circle"></i> Sled Push</li>
+                                <li><i class="fas fa-circle"></i> Sled Pull</li>
+                                <li><i class="fas fa-circle"></i> Burpee Broad Jumps</li>
+                                <li><i class="fas fa-circle"></i> Rowing (1000 m)</li>
+                                <li><i class="fas fa-circle"></i> Farmers Carry</li>
+                                <li><i class="fas fa-circle"></i> Wall Balls (100 reps)</li>
+                                <li><i class="fas fa-circle"></i> Simulacro de carrera completa</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Servicio Personalizado -->
+            <div class="custom-section">
+                <h2><i class="fas fa-star"></i> Entrenamiento Completamente Personalizado</h2>
+                <p>No creemos en los planes genéricos. Cada persona es única, por eso diseñamos un programa específico para ti, basado en:</p>
+                <div class="custom-features">
+                    <div class="custom-feature">
+                        <i class="fas fa-bullseye"></i>
+                        <h4>Tus Objetivos</h4>
+                        <p>Pérdida de grasa, ganancia muscular, rendimiento deportivo</p>
+                    </div>
+                    <div class="custom-feature">
+                        <i class="fas fa-chart-line"></i>
+                        <h4>Tu Nivel Actual</h4>
+                        <p>Principiante, intermedio o avanzado</p>
+                    </div>
+                    <div class="custom-feature">
+                        <i class="fas fa-clock"></i>
+                        <h4>Tu Disponibilidad</h4>
+                        <p>Rutinas adaptadas a tu horario y frecuencia</p>
+                    </div>
+                    <div class="custom-feature">
+                        <i class="fas fa-heartbeat"></i>
+                        <h4>Tu Estado de Salud</h4>
+                        <p>Considerando lesiones, condiciones médicas y limitaciones</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="cta-section">
+                <h2>¿Listo para comenzar?</h2>
+                <p>Tu viaje hacia una mejor versión de ti mismo comienza aquí</p>
+                <a href="registro.html" class="cta-button">Regístrate Ahora <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Jean Trainer - Todos los derechos reservados</p>
+        <div class="social-links">
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-youtube"></i></a>
+        </div>
+    </footer>
+
+    <script>
+        const toggleBtn = document.getElementById('toggleBtn');
+        const sidebar = document.getElementById('sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebarClose = document.getElementById('sidebarClose');
+
+        const openSidebar = () => {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        const closeSidebar = () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        };
+
+        toggleBtn.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        document.querySelectorAll('.sidebar-menu a').forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+    </script>
+</body>
+</html>

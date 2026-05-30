@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagar Membresía - Jean Trainer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        header {
+            background-color: #000;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            border-bottom: 2px solid #FFD700;
+        }
+        .navbar {
+            height: 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .back-btn {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .back-btn:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+        }
+        .container {
+            max-width: 800px;
+            margin: 100px auto 50px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 35px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        h1 {
+            color: #FFD700;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+        .subtitle {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        .current-plan {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .current-plan h3 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .plan-detail {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+        }
+        .plan-detail:last-child {
+            border-bottom: none;
+        }
+        .plan-label {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .plan-value {
+            color: #FFD700;
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+        .plan-status {
+            display: inline-block;
+            background: rgba(39, 174, 96, 0.2);
+            color: #27ae60;
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .plan-status.expired {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+        }
+        .plan-status.warning {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+        }
+        .precio-mensual {
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .precio-mensual span {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+        }
+        .dias-section {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .dias-section h4 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .dias-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        .dia-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dia-card:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        .dia-card.selected {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: #FFD700;
+        }
+        .dia-card .meses {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: #FFD700;
+        }
+        .dia-card .dias {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+        .dia-card .precio {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 5px;
+        }
+        .info-text {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin: 15px 0;
+            font-size: 0.85rem;
+            color: #ccc;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            color: #FFD700;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #FFD700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+        .methods-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .method-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .method-card:hover {
+            background: rgba(255, 215, 0, 0.1);
+            transform: translateY(-3px);
+        }
+        .method-card.selected {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: #FFD700;
+        }
+        .method-card i {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        .method-card h4 {
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        .bank-info {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border-left: 4px solid #FFD700;
+        }
+        .bank-info h4 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .bank-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .bank-detail {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            border-radius: 8px;
+        }
+        .bank-detail .label {
+            color: #aaa;
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+        }
+        .bank-detail .value {
+            color: #FFD700;
+            font-weight: 700;
+            font-size: 1rem;
+            word-break: break-all;
+        }
+        .copy-btn {
+            background: #FFD700;
+            color: #000;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+        .dynamic-fields {
+            display: none;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            margin-top: 15px;
+        }
+        .dynamic-fields.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        .resumen-box {
+            background: linear-gradient(135deg, #FFD700, #FFC400);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+        }
+        .resumen-box span {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #000;
+        }
+        .resumen-box label {
+            color: #000;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: block;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        .btn:hover {
+            background: #FFC400;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .container { padding: 20px; margin: 90px 20px 30px; }
+            .methods-grid { grid-template-columns: repeat(2, 1fr); }
+            .dias-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="../publico_general/dashboard.html">Jean Trainer</a></div>
+            <button class="back-btn" onclick="window.location.href='../publico_general/dashboard.html'">
+                <i class="fas fa-arrow-left"></i> Regresar
+            </button>
+        </div>
+    </header>
+    
+    <div class="container">
+        <h1><i class="fas fa-credit-card"></i> Pagar Membresía</h1>
+        <p class="subtitle">Extiende tu membresía por más tiempo</p>
+        
+        <div id="currentPlanCard" class="current-plan">
+            <h3><i class="fas fa-crown"></i> Tu Membresía Actual</h3>
+            <div class="plan-detail">
+                <span class="plan-label"><i class="fas fa-tag"></i> Plan:</span>
+                <span class="plan-value" id="planName">Cargando...</span>
+            </div>
+            <div class="plan-detail">
+                <span class="plan-label"><i class="fas fa-calendar-alt"></i> Fecha de inscripción:</span>
+                <span class="plan-value" id="fechaInicio">-</span>
+            </div>
+            <div class="plan-detail">
+                <span class="plan-label"><i class="fas fa-calendar-check"></i> Vence el:</span>
+                <span class="plan-value" id="fechaExpiracion">-</span>
+            </div>
+            <div class="plan-detail">
+                <span class="plan-label"><i class="fas fa-clock"></i> Estado:</span>
+                <span class="plan-status" id="planStatus">Verificando...</span>
+            </div>
+            <div class="plan-detail">
+                <span class="plan-label"><i class="fas fa-hourglass-half"></i> Días restantes:</span>
+                <span class="plan-value" id="diasRestantes">-</span>
+            </div>
+        </div>
+
+        <div class="precio-mensual">
+            <i class="fas fa-dollar-sign"></i> Precio mensual de tu plan:
+            <span id="precioMensual">$0.00</span>
+        </div>
+        
+        <form id="paymentForm">
+            <div class="dias-section">
+                <h4><i class="fas fa-calendar-plus"></i> ¿Cuánto tiempo quieres adelantar?</h4>
+                <div id="diasContainer" class="dias-grid">
+                    <div class="dia-card" data-meses="1">
+                        <div class="meses">1 mes</div>
+                        <div class="dias">30 días</div>
+                        <div class="precio" id="precio1M">$0</div>
+                    </div>
+                    <div class="dia-card" data-meses="2">
+                        <div class="meses">2 meses</div>
+                        <div class="dias">60 días</div>
+                        <div class="precio" id="precio2M">$0</div>
+                    </div>
+                    <div class="dia-card" data-meses="3">
+                        <div class="meses">3 meses</div>
+                        <div class="dias">90 días</div>
+                        <div class="precio" id="precio3M">$0</div>
+                    </div>
+                    <div class="dia-card" data-meses="6">
+                        <div class="meses">6 meses</div>
+                        <div class="dias">180 días</div>
+                        <div class="precio" id="precio6M">$0</div>
+                    </div>
+                    <div class="dia-card" data-meses="12">
+                        <div class="meses">12 meses</div>
+                        <div class="dias">365 días</div>
+                        <div class="precio" id="precio12M">$0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-text" id="newExpiryInfo">
+                <i class="fas fa-info-circle"></i> Selecciona los meses para ver tu nueva fecha de expiración
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-tag"></i> Tipo de pago</label>
+                <select id="tipo_pago" required>
+                    <option value="renovacion">🔄 Renovación / Adelanto</option>
+                    <option value="mensualidad">📅 Mensualidad</option>
+                    <option value="extra">✨ Pago Extra</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-credit-card"></i> Método de pago</label>
+                <div class="methods-grid">
+                    <div class="method-card" data-method="transferencia"><i class="fas fa-exchange-alt"></i><h4>Transferencia</h4></div>
+                    <div class="method-card" data-method="pago_movil"><i class="fas fa-mobile-alt"></i><h4>Pago Móvil</h4></div>
+                    <div class="method-card" data-method="efectivo"><i class="fas fa-money-bill"></i><h4>Efectivo</h4></div>
+                    <div class="method-card" data-method="tarjeta"><i class="fas fa-credit-card"></i><h4>Tarjeta</h4></div>
+                </div>
+            </div>
+            
+            <div id="bankInfoContainer"></div>
+            
+            <div id="pago_movil_fields" class="dynamic-fields">
+                <div class="form-group"><label><i class="fas fa-phone"></i> Teléfono del emisor</label><input type="tel" id="telefono_emisor" placeholder="0414-1234567"></div>
+                <div class="form-group"><label><i class="fas fa-university"></i> Banco del emisor</label><select id="banco_emisor"><option value="">Selecciona tu banco</option><option value="banesco">Banesco</option><option value="mercantil">Mercantil</option><option value="provincial">Provincial</option><option value="venezuela">Banco de Venezuela</option><option value="bicentenario">Bicentenario</option></select></div>
+                <div class="form-group"><label><i class="fas fa-id-card"></i> Cédula del emisor</label><input type="text" id="cedula_emisor" placeholder="V-12345678"></div>
+            </div>
+            
+            <div id="transferencia_fields" class="dynamic-fields">
+                <div class="form-group"><label><i class="fas fa-hashtag"></i> Número de referencia</label><input type="text" id="numero_referencia" placeholder="Ej: 1234567890"></div>
+                <div class="form-group"><label><i class="fas fa-university"></i> Banco desde donde transfieres</label><select id="banco_emisor_transferencia"><option value="">Selecciona tu banco</option><option value="banesco">Banesco</option><option value="mercantil">Mercantil</option><option value="provincial">Provincial</option><option value="venezuela">Banco de Venezuela</option><option value="bicentenario">Bicentenario</option></select></div>
+            </div>
+            
+            <div id="efectivo_fields" class="dynamic-fields">
+                <div class="form-group"><label><i class="fas fa-receipt"></i> Número de recibo</label><input type="text" id="recibo_numero" placeholder="Recibo #"></div>
+            </div>
+            
+            <div id="tarjeta_fields" class="dynamic-fields">
+                <div class="form-group"><label><i class="fas fa-hashtag"></i> Número de aprobación</label><input type="text" id="aprobacion_numero" placeholder="Código de aprobación"></div>
+            </div>
+            
+            <div class="resumen-box">
+                <label><i class="fas fa-coins"></i> Total a pagar</label>
+                <span id="totalDisplay">$0.00</span>
+            </div>
+            
+            <button type="submit" class="btn" id="submitBtn">
+                <i class="fas fa-check-circle"></i> Registrar Pago y Extender Membresía
+            </button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { supabase } from '../publico_general/supabaseClient.js';
+        
+        const bankAccounts = {
+            pago_movil: { title: "📱 Datos para Pago Móvil", accounts: [{ bank: "Banesco", phone: "0412-1234567", cedula: "V-12345678", beneficiary: "Jean Trainer" }] },
+            transferencia: { title: "🏦 Datos para Transferencia", accounts: [{ bank: "Banesco", account: "0134-1234-56-1234567890", type: "Cuenta Corriente", cedula: "J-12345678-9", beneficiary: "Jean Trainer C.A." }] },
+            efectivo: { title: "💵 Pago en Efectivo", accounts: [{ location: "Sede Principal - Av. Principal, Local 1", hours: "Lunes a Viernes 8am - 6pm" }] },
+            tarjeta: { title: "💳 Pago con Tarjeta", accounts: [{ info: "Pago presencial en el gimnasio con tarjeta de débito/crédito" }] }
+        };
+        
+        let currentUser = null;
+        let userMembership = null;
+        let userPlan = null;
+        let precioMensual = 0;
+        let selectedMeses = 1;
+        let selectedPrecio = 0;
+        let selectedMethod = "transferencia";
+        
+        const totalDisplay = document.getElementById('totalDisplay');
+        const bankInfoContainer = document.getElementById('bankInfoContainer');
+        const submitBtn = document.getElementById('submitBtn');
+        const precioMensualSpan = document.getElementById('precioMensual');
+        
+        async function obtenerPlanUsuario() {
+            try {
+                const { data: membership, error: memError } = await supabase
+                    .from('membresias')
+                    .select('*')
+                    .eq('id_usuario', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                
+                if (memError) throw memError;
+                userMembership = membership;
+                
+                if (membership) {
+                    const { data: plan, error: planError } = await supabase
+                        .from('catalogo_planes')
+                        .select('*')
+                        .eq('tipo', membership.tipo)
+                        .single();
+                    
+                    if (planError && planError.code !== 'PGRST116') {
+                        console.error('Error buscando plan:', planError);
+                    }
+                    
+                    if (plan) {
+                        userPlan = plan;
+                        precioMensual = plan.precio;
+                        document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> ${plan.nombre}`;
+                    } else {
+                        precioMensual = 45;
+                    }
+                } else {
+                    precioMensual = 45;
+                }
+                
+                precioMensualSpan.textContent = `$${precioMensual.toFixed(2)}`;
+                actualizarPreciosBotones();
+                return membership;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                precioMensual = 45;
+                precioMensualSpan.textContent = `$${precioMensual.toFixed(2)}`;
+                actualizarPreciosBotones();
+                return null;
+            }
+        }
+        
+        function actualizarPreciosBotones() {
+            const precios = {
+                1: precioMensual,
+                2: precioMensual * 2,
+                3: precioMensual * 3,
+                6: precioMensual * 6,
+                12: precioMensual * 12
+            };
+            
+            document.getElementById('precio1M').textContent = `$${precios[1].toFixed(2)}`;
+            document.getElementById('precio2M').textContent = `$${precios[2].toFixed(2)}`;
+            document.getElementById('precio3M').textContent = `$${precios[3].toFixed(2)}`;
+            document.getElementById('precio6M').textContent = `$${precios[6].toFixed(2)}`;
+            document.getElementById('precio12M').textContent = `$${precios[12].toFixed(2)}`;
+        }
+        
+        function initMesesButtons() {
+            const buttons = document.querySelectorAll('.dia-card');
+            
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    buttons.forEach(b => b.classList.remove('selected'));
+                    this.classList.add('selected');
+                    
+                    selectedMeses = parseInt(this.dataset.meses);
+                    selectedPrecio = precioMensual * selectedMeses;
+                    totalDisplay.textContent = `$${selectedPrecio.toFixed(2)}`;
+                    actualizarInfoNuevaFecha();
+                });
+            });
+            
+            const defaultBtn = document.querySelector('.dia-card[data-meses="1"]');
+            if (defaultBtn) defaultBtn.click();
+        }
+        
+        function actualizarInfoNuevaFecha() {
+            const infoDiv = document.getElementById('newExpiryInfo');
+            if (!userMembership || !selectedMeses) {
+                infoDiv.innerHTML = `<i class="fas fa-info-circle"></i> Selecciona los meses para ver tu nueva fecha de expiración`;
+                return;
+            }
+            
+            const diasAAgregar = selectedMeses * 30;
+            const fechaActualExp = userMembership.fecha_expiracion ? new Date(userMembership.fecha_expiracion) : new Date();
+            const hoy = new Date();
+            
+            let fechaBase = fechaActualExp;
+            if (fechaActualExp < hoy) {
+                fechaBase = hoy;
+            }
+            
+            const nuevaFecha = new Date(fechaBase);
+            nuevaFecha.setDate(nuevaFecha.getDate() + diasAAgregar);
+            
+            const fechaBaseStr = fechaBase.toLocaleDateString('es-ES');
+            const nuevaFechaStr = nuevaFecha.toLocaleDateString('es-ES');
+            
+            if (fechaActualExp < hoy) {
+                infoDiv.innerHTML = `<i class="fas fa-star-of-life"></i> ⚡ Tu membresía está vencida. Al pagar ${selectedMeses} mes(es), comenzará desde hoy: <strong>${nuevaFechaStr}</strong> (+${diasAAgregar} días)`;
+            } else {
+                infoDiv.innerHTML = `<i class="fas fa-calendar-plus"></i> 📅 Tu membresía actual vence el <strong>${fechaBaseStr}</strong>. Al pagar ${selectedMeses} mes(es), se extenderá hasta el <strong>${nuevaFechaStr}</strong> (+${diasAAgregar} días)`;
+            }
+        }
+        
+        async function loadUserMembership() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (error || !user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                currentUser = user;
+                
+                const membership = await obtenerPlanUsuario();
+                
+                const fechaInicioEl = document.getElementById('fechaInicio');
+                const fechaExpiracionEl = document.getElementById('fechaExpiracion');
+                const planStatusEl = document.getElementById('planStatus');
+                const diasRestantesEl = document.getElementById('diasRestantes');
+                
+                if (membership) {
+                    fechaInicioEl.textContent = new Date(membership.fecha_inscrito).toLocaleDateString('es-ES');
+                    
+                    const expiryDate = membership.fecha_expiracion || membership.fecha_siguiente_pago;
+                    if (expiryDate) {
+                        const expDate = new Date(expiryDate);
+                        const hoy = new Date();
+                        const diasRestantes = Math.ceil((expDate - hoy) / (1000 * 60 * 60 * 24));
+                        
+                        fechaExpiracionEl.textContent = expDate.toLocaleDateString('es-ES');
+                        diasRestantesEl.textContent = diasRestantes > 0 ? `${diasRestantes} días` : 'Vencida';
+                        
+                        if (diasRestantes < 0) {
+                            planStatusEl.textContent = '⚠️ VENCIDA';
+                            planStatusEl.className = 'plan-status expired';
+                            diasRestantesEl.innerHTML = '<span style="color:#e74c3c;">Vencida</span>';
+                        } else if (diasRestantes <= 7) {
+                            planStatusEl.textContent = '⚠️ PRÓXIMO A VENCER';
+                            planStatusEl.className = 'plan-status warning';
+                        } else {
+                            planStatusEl.textContent = '✅ ACTIVA';
+                            planStatusEl.className = 'plan-status';
+                        }
+                    } else {
+                        fechaExpiracionEl.textContent = 'No registrada';
+                        planStatusEl.textContent = '✅ ACTIVA';
+                        diasRestantesEl.textContent = 'Ilimitado?';
+                    }
+                } else {
+                    document.getElementById('planName').innerHTML = '<i class="fas fa-info-circle"></i> Sin plan activo';
+                    fechaInicioEl.textContent = '-';
+                    fechaExpiracionEl.textContent = '-';
+                    planStatusEl.textContent = '📝 SIN PLAN';
+                    planStatusEl.className = 'plan-status expired';
+                    diasRestantesEl.textContent = '0 días';
+                }
+                
+                actualizarInfoNuevaFecha();
+                
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+        
+        function loadBankInfo(method) {
+            const bankData = bankAccounts[method];
+            if (!bankData) return;
+            let html = `<div class="bank-info"><h4><i class="fas fa-university"></i> ${bankData.title}</h4><div class="bank-details">`;
+            bankData.accounts.forEach(account => {
+                for (const [key, value] of Object.entries(account)) {
+                    if (value) {
+                        let label = { bank:'🏦 Banco', account:'📊 Número de Cuenta', type:'📋 Tipo de Cuenta', cedula:'📄 RIF/Cédula', beneficiary:'👤 Beneficiario', phone:'📞 Teléfono', location:'📍 Ubicación', hours:'🕐 Horario', info:'ℹ️ Información' }[key] || key;
+                        html += `<div class="bank-detail"><div class="label">${label}</div><div class="value">${value}<button class="copy-btn" onclick="copyToClipboard('${value.replace(/'/g, "\\'")}')"><i class="fas fa-copy"></i> Copiar</button></div></div>`;
+                    }
+                }
+            });
+            html += `</div></div>`;
+            bankInfoContainer.innerHTML = html;
+        }
+        
+        window.copyToClipboard = function(text) { 
+            navigator.clipboard.writeText(text); 
+            alert('✅ Copiado: ' + text); 
+        };
+        
+        function showDynamicFields(method) {
+            ['pago_movil_fields', 'transferencia_fields', 'efectivo_fields', 'tarjeta_fields'].forEach(f => { 
+                const el = document.getElementById(f); 
+                if(el) el.classList.remove('active'); 
+            });
+            const activeField = document.getElementById(`${method}_fields`);
+            if (activeField) activeField.classList.add('active');
+        }
+        
+        function initPaymentMethods() {
+            const methodCards = document.querySelectorAll('.method-card');
+            methodCards.forEach(card => {
+                card.addEventListener('click', function() { 
+                    methodCards.forEach(c => c.classList.remove('selected')); 
+                    this.classList.add('selected'); 
+                    selectedMethod = this.dataset.method; 
+                    loadBankInfo(selectedMethod); 
+                    showDynamicFields(selectedMethod); 
+                });
+            });
+            document.querySelector('.method-card[data-method="transferencia"]')?.click();
+        }
+        
+        document.getElementById('paymentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!currentUser) {
+                alert('Debes iniciar sesión');
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            if (!selectedMeses) {
+                alert('Selecciona cuántos meses quieres adelantar');
+                return;
+            }
+            
+            const monto = selectedPrecio;
+            const tipo = document.getElementById('tipo_pago').value;
+            const periodo = selectedMeses * 30;
+            
+            let params = {
+                p_id_usuario: currentUser.id,
+                p_monto: monto,
+                p_metodo_pago: selectedMethod,
+                p_tipo_pago: tipo,
+                p_periodo_dias: periodo
+            };
+            
+            if (selectedMethod === 'pago_movil') {
+                const telefono = document.getElementById('telefono_emisor')?.value;
+                const banco = document.getElementById('banco_emisor')?.value;
+                const cedula = document.getElementById('cedula_emisor')?.value;
+                if (!telefono || !banco || !cedula) { alert('Completa todos los datos del Pago Móvil'); return; }
+                params.p_telefono_emisor = telefono;
+                params.p_banco_emisor = banco;
+                params.p_cedula_emisor = cedula;
+            } else if (selectedMethod === 'transferencia') {
+                const referencia = document.getElementById('numero_referencia')?.value;
+                const banco = document.getElementById('banco_emisor_transferencia')?.value;
+                if (!referencia || !banco) { alert('Completa la referencia y el banco'); return; }
+                params.p_numero_referencia = referencia;
+                params.p_banco_emisor = banco;
+            } else if (selectedMethod === 'efectivo') {
+                const recibo = document.getElementById('recibo_numero')?.value;
+                if (!recibo) { alert('Ingresa el número de recibo'); return; }
+                params.p_recibo_numero = recibo;
+            } else if (selectedMethod === 'tarjeta') {
+                const aprobacion = document.getElementById('aprobacion_numero')?.value;
+                if (!aprobacion) { alert('Ingresa el número de aprobación'); return; }
+                params.p_aprobacion_numero = aprobacion;
+            }
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando pago...';
+            
+            try {
+                const { data, error } = await supabase.rpc('crear_pago', params);
+                if (error) throw error;
+                
+                if (data?.success) {
+                    let metodoNombre = { pago_movil:'Pago Móvil', transferencia:'Transferencia', efectivo:'Efectivo', tarjeta:'Tarjeta' }[selectedMethod];
+                    alert(`✅ ¡Pago registrado exitosamente!\n\n📅 Meses adelantados: ${selectedMeses} mes(es) (${periodo} días)\n💰 Monto: $${monto}\n📱 Método: ${metodoNombre}\n⏳ Estado: Pendiente de verificación\n\nEl administrador verificará tu pago y extenderá tu membresía pronto.`);
+                    window.location.href = '../publico_general/dashboard.html';
+                } else {
+                    throw new Error(data?.error || 'Error al registrar pago');
+                }
+            } catch (error) {
+                alert('❌ Error: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Registrar Pago y Extender Membresía';
+            }
+        });
+        
+        async function init() {
+            await loadUserMembership();
+            initMesesButtons();
+            initPaymentMethods();
+        }
+        
+        init();
+    </script>
+</body>
+</html>

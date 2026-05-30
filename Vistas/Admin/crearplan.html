@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Gestionar Planes - Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #000;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            border-bottom: 2px solid #FFD700;
+        }
+
+        .navbar {
+            height: 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+            text-transform: uppercase;
+        }
+
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .back-btn {
+            background-color: #333;
+            color: #FFD700;
+            border: 2px solid #FFD700;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #FFD700;
+            color: #000;
+        }
+
+        .admin-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 120px 30px 50px;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #FFD700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .page-subtitle {
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 50px;
+            font-size: 1.2rem;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 30px;
+        }
+
+        .plan-form {
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid #333;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #FFD700;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #FFD700;
+            background: rgba(255, 215, 0, 0.05);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .deportes-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .deporte-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 10px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #333;
+        }
+
+        .deporte-checkbox:hover {
+            background: rgba(255, 215, 0, 0.1);
+            border-color: #FFD700;
+        }
+
+        .deporte-checkbox.selected {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: #FFD700;
+        }
+
+        .deporte-checkbox input {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #FFD700;
+        }
+
+        .deporte-checkbox label {
+            margin: 0;
+            cursor: pointer;
+            color: #fff;
+            font-weight: normal;
+        }
+
+        .deporte-icon {
+            font-size: 1.2rem;
+            margin-right: 8px;
+        }
+
+        .planes-list {
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid #333;
+        }
+
+        .planes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .planes-header h3 {
+            color: #FFD700;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .planes-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: 550px;
+            overflow-y: auto;
+        }
+
+        .plan-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .plan-card:hover {
+            border-color: #FFD700;
+        }
+
+        .plan-card.inactivo {
+            opacity: 0.6;
+            border-color: #666;
+        }
+
+        .plan-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            background: #27ae60;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+        }
+
+        .badge.inactivo {
+            background: #e74c3c;
+        }
+
+        .plan-nombre {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .plan-precio {
+            font-size: 1.3rem;
+            color: #FFD700;
+            font-weight: 800;
+        }
+
+        .plan-precio small {
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .plan-periodo {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin: 8px 0;
+        }
+
+        .plan-deportes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .deporte-tag {
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        .plan-descripcion {
+            color: #ccc;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .plan-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            border-top: 1px solid #333;
+            padding-top: 12px;
+            margin-top: 5px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: #FFD700;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-icon:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .btn-icon.delete {
+            color: #e74c3c;
+        }
+
+        .btn-icon.delete:hover {
+            background: rgba(231, 76, 60, 0.2);
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.2);
+            border: 1px solid #27ae60;
+            color: #27ae60;
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.2);
+            border: 1px solid #e74c3c;
+            color: #e74c3c;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #FFD700;
+            color: #000;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #FFC400;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid #FFD700;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #FFD700;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        @media (max-width: 900px) {
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            .admin-content {
+                padding: 100px 20px 30px;
+            }
+            .deportes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="dashboard_admin.html">Athlex</a></div>
+            <a href="../publico_general/dashboard_admin.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Dashboard
+            </a>
+        </div>
+    </header>
+
+    <main class="admin-content">
+        <h1 class="page-title">Gestionar Planes</h1>
+        <p class="page-subtitle">Crea, edita o elimina los planes de membresía</p>
+
+        <div id="alertContainer"></div>
+
+        <div class="two-columns">
+            <div class="plan-form">
+                <h3 style="color: #FFD700; margin-bottom: 20px;" id="formTitle">
+                    <i class="fas fa-plus-circle"></i> Crear Nuevo Plan
+                </h3>
+                <form id="planForm">
+                    <div class="form-group">
+                        <label><i class="fas fa-crown"></i> Nombre del Plan <span style="color: #e74c3c;">*</span></label>
+                        <input type="text" class="form-control" id="planNombre" placeholder="Ej: Crossfit Standard" required>
+                        <small style="color: #aaa;">El nombre será el identificador único del plan</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-dollar-sign"></i> Precio ($)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" id="planPrecio" placeholder="50.00" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-calendar"></i> Período (días)</label>
+                        <select class="form-control" id="planPeriodo" required>
+                            <option value="30">30 días (1 mes)</option>
+                            <option value="60">60 días (2 meses)</option>
+                            <option value="90">90 días (3 meses)</option>
+                            <option value="180">180 días (6 meses)</option>
+                            <option value="365">365 días (1 año)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-dumbbell"></i> Deportes incluidos</label>
+                        <div class="deportes-grid" id="deportesGrid">
+                            <div class="deporte-checkbox" data-deporte="crossfit">
+                                <input type="checkbox" value="crossfit" id="deporte_crossfit">
+                                <label for="deporte_crossfit"><span class="deporte-icon">🏋️</span> Crossfit</label>
+                            </div>
+                            <div class="deporte-checkbox" data-deporte="running">
+                                <input type="checkbox" value="running" id="deporte_running">
+                                <label for="deporte_running"><span class="deporte-icon">🏃</span> Running</label>
+                            </div>
+                            <div class="deporte-checkbox" data-deporte="hyrox">
+                                <input type="checkbox" value="hyrox" id="deporte_hyrox">
+                                <label for="deporte_hyrox"><span class="deporte-icon">💪</span> Hyrox</label>
+                            </div>
+                            <div class="deporte-checkbox" data-deporte="personalizado">
+                                <input type="checkbox" value="personalizado" id="deporte_personalizado">
+                                <label for="deporte_personalizado"><span class="deporte-icon">📋</span> Personalizado</label>
+                            </div>
+                        </div>
+                        <small style="color: #aaa;">Selecciona los deportes que incluye este plan</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fas fa-align-left"></i> Descripción</label>
+                        <textarea class="form-control" id="planDescripcion" rows="3" placeholder="Beneficios y características del plan..." required></textarea>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" id="cancelBtn" style="display: none;">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-save"></i> Guardar Plan
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="planes-list">
+                <div class="planes-header">
+                    <h3>
+                        <i class="fas fa-list"></i> Planes Existentes
+                        <span id="planesCount" style="background: #333; padding: 3px 10px; border-radius: 50px; font-size: 0.9rem;">0</span>
+                    </h3>
+                    <button class="btn-secondary" onclick="location.reload()" style="padding: 8px 15px;">
+                        <i class="fas fa-sync-alt"></i> Recargar
+                    </button>
+                </div>
+                <div id="planesContainer" class="planes-grid">
+                    <div class="loading">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Cargando planes...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { supabase } from '../publico_general/supabaseClient.js';
+
+        let editingPlan = null;
+
+        function generarTipoDesdeNombre(nombre) {
+            let tipo = nombre.toLowerCase();
+            tipo = tipo.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            tipo = tipo.replace(/[^a-z0-9]/g, '_');
+            tipo = tipo.replace(/_+/g, '_');
+            tipo = tipo.replace(/^_|_$/g, '');
+            return tipo;
+        }
+
+        async function checkAdmin() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (error || !user) {
+                window.location.href = '../publico_general/login.html';
+                return false;
+            }
+            const { data: profile } = await supabase
+                .from('usuarios')
+                .select('rol')
+                .eq('id_usuario', user.id)
+                .single();
+            if (!profile || profile.rol !== 'admin') {
+                alert('Acceso denegado. Solo administradores.');
+                window.location.href = '../publico_general/dashboard.html';
+                return false;
+            }
+            return true;
+        }
+
+        function getDeportesSeleccionados() {
+            const checkboxes = document.querySelectorAll('#deportesGrid input[type="checkbox"]');
+            const seleccionados = [];
+            checkboxes.forEach(cb => {
+                if (cb.checked) seleccionados.push(cb.value);
+            });
+            return seleccionados;
+        }
+
+        function marcarDeportes(deportes) {
+            const checkboxes = document.querySelectorAll('#deportesGrid input[type="checkbox"]');
+            checkboxes.forEach(cb => {
+                cb.checked = deportes.includes(cb.value);
+                const parent = cb.closest('.deporte-checkbox');
+                if (parent) {
+                    if (cb.checked) parent.classList.add('selected');
+                    else parent.classList.remove('selected');
+                }
+            });
+        }
+
+        async function cargarPlanes() {
+            try {
+                const { data: planes, error } = await supabase
+                    .from('catalogo_planes')
+                    .select('*')
+                    .order('nombre', { ascending: true });
+
+                if (error) throw error;
+
+                const container = document.getElementById('planesContainer');
+                const countSpan = document.getElementById('planesCount');
+                
+                if (!planes || planes.length === 0) {
+                    container.innerHTML = `<div class="empty-state"><i class="fas fa-box-open" style="font-size: 3rem;"></i><p>No hay planes creados aún</p><small>Usa el formulario para crear tu primer plan</small></div>`;
+                    countSpan.textContent = '0';
+                    return;
+                }
+
+                countSpan.textContent = planes.length;
+                
+                container.innerHTML = planes.map(plan => {
+                    const deportes = plan.deportes_incluidos || [];
+                    return `
+                    <div class="plan-card ${!plan.activo ? 'inactivo' : ''}">
+                        <div class="plan-header">
+                            ${!plan.activo ? '<span class="badge inactivo">Inactivo</span>' : '<span class="badge">Activo</span>'}
+                        </div>
+                        <div class="plan-nombre">${escapeHtml(plan.nombre)}</div>
+                        <div class="plan-precio">$${plan.precio} <small>/mes</small></div>
+                        <div class="plan-periodo"><i class="fas fa-calendar-alt"></i> ${plan.periodo_dias} días</div>
+                        <div class="plan-deportes">${deportes.map(d => `<span class="deporte-tag"><i class="fas ${getDeporteIcon(d)}"></i> ${getDeporteNombre(d)}</span>`).join('')}</div>
+                        <div class="plan-descripcion">${escapeHtml(plan.descripcion || 'Sin descripción')}</div>
+                        <div class="plan-actions">
+                            <button class="btn-icon" onclick="window.editarPlan('${escapeHtml(plan.nombre)}')"><i class="fas fa-edit"></i> Editar</button>
+                            <button class="btn-icon ${plan.activo ? '' : 'delete'}" onclick="window.togglePlanEstado('${escapeHtml(plan.nombre)}', ${!plan.activo})"><i class="fas ${plan.activo ? 'fa-eye-slash' : 'fa-eye'}"></i> ${plan.activo ? 'Desactivar' : 'Activar'}</button>
+                            <button class="btn-icon delete" onclick="window.eliminarPlan('${escapeHtml(plan.nombre)}', '${escapeHtml(plan.nombre)}')"><i class="fas fa-trash"></i> Eliminar</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('planesContainer').innerHTML = `<div class="empty-state"><i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i><p>Error cargando planes</p><small>${error.message}</small></div>`;
+            }
+        }
+
+        function getDeporteIcon(deporte) {
+            const icons = { 'crossfit': 'fa-fire', 'running': 'fa-running', 'hyrox': 'fa-medal', 'personalizado': 'fa-user-cog' };
+            return icons[deporte] || 'fa-dumbbell';
+        }
+
+        function getDeporteNombre(deporte) {
+            const nombres = { 'crossfit': 'Crossfit', 'running': 'Running', 'hyrox': 'Hyrox', 'personalizado': 'Personalizado' };
+            return nombres[deporte] || deporte;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        window.editarPlan = async function(planNombre) {
+            try {
+                const { data: plan, error } = await supabase
+                    .from('catalogo_planes')
+                    .select('*')
+                    .eq('nombre', planNombre)
+                    .single();
+                if (error) throw error;
+                editingPlan = plan;
+                document.getElementById('planNombre').value = plan.nombre;
+                document.getElementById('planNombre').readOnly = true;
+                document.getElementById('planPrecio').value = plan.precio;
+                document.getElementById('planPeriodo').value = plan.periodo_dias;
+                document.getElementById('planDescripcion').value = plan.descripcion || '';
+                marcarDeportes(plan.deportes_incluidos || []);
+                document.getElementById('formTitle').innerHTML = '<i class="fas fa-edit"></i> Editar Plan';
+                document.getElementById('cancelBtn').style.display = 'inline-flex';
+                document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Actualizar Plan';
+                document.querySelector('.plan-form').scrollIntoView({ behavior: 'smooth' });
+                showAlert(`Editando plan: ${plan.nombre}`, 'success');
+            } catch (error) {
+                showAlert('Error al cargar el plan para editar', 'error');
+            }
+        };
+
+        document.getElementById('cancelBtn').addEventListener('click', function() { resetForm(); });
+
+        function resetForm() {
+            document.getElementById('planForm').reset();
+            document.getElementById('planNombre').readOnly = false;
+            document.getElementById('formTitle').innerHTML = '<i class="fas fa-plus-circle"></i> Crear Nuevo Plan';
+            document.getElementById('cancelBtn').style.display = 'none';
+            document.getElementById('submitBtn').innerHTML = '<i class="fas fa-save"></i> Guardar Plan';
+            marcarDeportes([]);
+            editingPlan = null;
+        }
+
+        function setupCheckboxStyles() {
+            document.querySelectorAll('#deportesGrid input[type="checkbox"]').forEach(cb => {
+                cb.addEventListener('change', function() {
+                    const parent = this.closest('.deporte-checkbox');
+                    if (parent) {
+                        if (this.checked) parent.classList.add('selected');
+                        else parent.classList.remove('selected');
+                    }
+                });
+            });
+        }
+
+        document.getElementById('planForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('planNombre').value.trim();
+            const precio = parseFloat(document.getElementById('planPrecio').value);
+            const periodo = parseInt(document.getElementById('planPeriodo').value);
+            const descripcion = document.getElementById('planDescripcion').value.trim();
+            const deportes = getDeportesSeleccionados();
+            const tipo = generarTipoDesdeNombre(nombre);
+            
+            if (!nombre) { showAlert('El nombre del plan es obligatorio', 'error'); return; }
+            if (precio <= 0) { showAlert('El precio debe ser mayor a 0', 'error'); return; }
+            if (deportes.length === 0) { showAlert('Debes seleccionar al menos un deporte', 'error'); return; }
+            if (descripcion.length < 10) { showAlert('La descripción debe tener al menos 10 caracteres', 'error'); return; }
+            
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            try {
+                if (editingPlan) {
+                    const { error } = await supabase
+                        .from('catalogo_planes')
+                        .update({ 
+                            precio, 
+                            periodo_dias: periodo, 
+                            descripcion, 
+                            deportes_incluidos: deportes, 
+                            es_combo: deportes.length > 1, 
+                            updated_at: new Date().toISOString() 
+                        })
+                        .eq('nombre', editingPlan.nombre);
+                    if (error) throw error;
+                    showAlert(`✅ Plan "${nombre}" actualizado correctamente`, 'success');
+                } else {
+                    const { error } = await supabase
+                        .from('catalogo_planes')
+                        .insert([{ 
+                            tipo: tipo,
+                            nombre, 
+                            precio, 
+                            periodo_dias: periodo, 
+                            descripcion, 
+                            deportes_incluidos: deportes, 
+                            es_combo: deportes.length > 1, 
+                            activo: true 
+                        }]);
+                    if (error) {
+                        if (error.code === '23505') {
+                            showAlert(`❌ Ya existe un plan con nombre similar. Usa otro nombre.`, 'error');
+                        } else {
+                            throw error;
+                        }
+                        return;
+                    }
+                    showAlert(`✅ Plan "${nombre}" creado exitosamente`, 'success');
+                }
+                resetForm();
+                await cargarPlanes();
+            } catch (error) {
+                showAlert('Error: ' + error.message, 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = editingPlan ? '<i class="fas fa-save"></i> Actualizar Plan' : '<i class="fas fa-save"></i> Guardar Plan';
+            }
+        });
+
+        window.togglePlanEstado = async function(planNombre, activar) {
+            const accion = activar ? 'activar' : 'desactivar';
+            if (!confirm(`¿Estás seguro de ${accion} este plan?`)) return;
+            try {
+                const { error } = await supabase.from('catalogo_planes').update({ activo: activar }).eq('nombre', planNombre);
+                if (error) throw error;
+                showAlert(`✅ Plan ${accion}do correctamente`, 'success');
+                await cargarPlanes();
+            } catch (error) { showAlert('Error: ' + error.message, 'error'); }
+        };
+
+        window.eliminarPlan = async function(planNombre, nombre) {
+            if (!confirm(`⚠️ ¿ELIMINAR PERMANENTEMENTE el plan "${nombre}"?\n\nEsta acción no se puede deshacer.`)) return;
+            try {
+                const { error } = await supabase.from('catalogo_planes').delete().eq('nombre', planNombre);
+                if (error) throw error;
+                showAlert(`✅ Plan "${nombre}" eliminado correctamente`, 'success');
+                await cargarPlanes();
+                if (editingPlan && editingPlan.nombre === planNombre) resetForm();
+            } catch (error) { showAlert('Error: ' + error.message, 'error'); }
+        };
+
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+            alert.innerHTML = `<i class="fas ${icon}"></i><span>${message}</span>`;
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            setTimeout(() => { if (alert.parentNode) alert.remove(); }, 4000);
+        }
+
+        async function init() {
+            if (await checkAdmin()) {
+                await cargarPlanes();
+                setupCheckboxStyles();
+            }
+        }
+        init();
+    </script>
+</body>
+</html>

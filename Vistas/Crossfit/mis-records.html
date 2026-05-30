@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Mis Récords Personales - Jean Trainer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
+        body { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); color: #fff; line-height: 1.6; min-height: 100vh; }
+        header { background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); position: fixed; width: 100%; z-index: 1000; top: 0; border-bottom: 1px solid rgba(255,215,0,0.3); }
+        .navbar { height: 70px; max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; }
+        .logo { font-size: 1.8rem; font-weight: 800; color: #FFD700; text-transform: uppercase; letter-spacing: 1px; }
+        .logo a { color: inherit; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        .back-btn { background: #FFD700; color: #000; border: none; border-radius: 50px; padding: 10px 25px; font-size: 1rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s ease; }
+        .back-btn:hover { background: #FFC400; transform: scale(1.05); }
+        .main-content { max-width: 1400px; margin: 0 auto; padding: 100px 20px 50px; }
+        .page-title { font-size: 2.2rem; color: #FFD700; margin-bottom: 30px; text-align: center; }
+        .sports-tabs { display: flex; gap: 15px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap; }
+        .sport-tab { background: rgba(255,255,255,0.05); border: 2px solid transparent; border-radius: 50px; padding: 12px 30px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px; }
+        .sport-tab.active { background: rgba(255,215,0,0.15); border-color: #FFD700; color: #FFD700; }
+        .category-card { background: rgba(255,255,255,0.05); border-radius: 15px; margin-bottom: 25px; border: 1px solid rgba(255,215,0,0.2); overflow: hidden; }
+        .category-header { background: linear-gradient(135deg, rgba(255,215,0,0.1), rgba(255,215,0,0.05)); padding: 15px 25px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .category-header h3 { color: #FFD700; display: flex; align-items: center; gap: 10px; }
+        .category-header i { transition: transform 0.3s ease; }
+        .category-header.collapsed i { transform: rotate(-90deg); }
+        .category-content { display: block; }
+        .category-content.collapsed { display: none; }
+        .exercises-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; padding: 20px; }
+        .exercise-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s ease; }
+        .exercise-card:hover { border-color: #FFD700; transform: translateX(5px); }
+        .exercise-name { font-weight: 700; color: #fff; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .exercise-name .badge { font-size: 0.7rem; padding: 3px 8px; background: rgba(255,215,0,0.15); color: #FFD700; border-radius: 20px; }
+        .current-record { background: rgba(255,215,0,0.1); border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .record-value { font-size: 1.3rem; font-weight: 800; color: #FFD700; }
+        .record-date { font-size: 0.7rem; color: #aaa; margin-top: 5px; }
+        .input-group { display: flex; gap: 10px; margin-top: 10px; }
+        .input-group input { flex: 1; padding: 10px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: #fff; }
+        .save-btn { background: #FFD700; color: #000; border: none; border-radius: 8px; padding: 8px 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .save-btn:hover { background: #FFC400; }
+        .notification { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 10px; z-index: 3000; font-weight: 600; animation: slideIn 0.3s ease; }
+        .notification.success { background: #4CAF50; color: white; }
+        .notification.error { background: #f44336; color: white; }
+        .loading-spinner { font-size: 3rem; color: #FFD700; animation: spin 1s linear infinite; text-align: center; padding: 60px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="dashboard-crossfit.html"><i class="fas fa-dumbbell"></i> Jean Trainer</a></div>
+            <button class="back-btn" onclick="window.location.href='dashboard-crossfit.html'"><i class="fas fa-arrow-left"></i> Regresar</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <h1 class="page-title">🏆 MIS RÉCORDS PERSONALES</h1>
+        <div class="sports-tabs" id="sportsTabs"></div>
+        <div id="recordsContainer"><div class="loading-spinner"><i class="fas fa-spinner"></i></div></div>
+    </main>
+
+    <script type="module">
+        import { supabase } from '../publico_general/supabaseClient.js';
+        
+        let currentUser = null;
+        let allRecords = [];
+        let ejerciciosLista = [];
+        
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { window.location.href = 'login.html'; return; }
+            currentUser = user;
+            await Promise.all([cargarEjercicios(), cargarRecords()]);
+            renderizarTabs();
+        });
+        
+        async function cargarEjercicios() {
+            const { data } = await supabase
+                .from('ejercicios')
+                .select('id, nombre, tipo_medida, unidad_default, categoria_id, categoria:categoria_id(nombre, deporte)')
+                .order('orden');
+            ejerciciosLista = data || [];
+        }
+        
+        async function cargarRecords() {
+            const { data } = await supabase
+                .from('records_personales')
+                .select('*')
+                .eq('id_usuario', currentUser.id);
+            allRecords = data || [];
+        }
+        
+        function getRecord(ejercicioId) {
+            return allRecords.find(r => r.ejercicio_id === ejercicioId);
+        }
+        
+        async function guardarRecord(ejercicioId, nombreEjercicio) {
+            const input = document.getElementById(`input_${ejercicioId}`);
+            const valor = parseFloat(input.value);
+            
+            if (isNaN(valor)) {
+                mostrarNotificacion('Ingresa un valor válido', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById(`btn_${ejercicioId}`);
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+            
+            const { data, error } = await supabase
+                .rpc('guardar_record', {
+                    p_usuario_id: currentUser.id,
+                    p_ejercicio_id: ejercicioId,
+                    p_valor: valor,
+                    p_notas: null
+                });
+            
+            if (error) {
+                // Fallback directo
+                const existing = allRecords.find(r => r.ejercicio_id === ejercicioId);
+                if (existing) {
+                    await supabase.from('records_personales').update({ valor }).eq('id', existing.id);
+                } else {
+                    await supabase.from('records_personales').insert({
+                        id_usuario: currentUser.id,
+                        ejercicio_id: ejercicioId,
+                        valor
+                    });
+                }
+            }
+            
+            await cargarRecords();
+            renderizarEjercicios(document.querySelector('.sport-tab.active')?.dataset.deporte || 'crossfit');
+            mostrarNotificacion(`✅ Récord de ${nombreEjercicio} guardado!`, 'success');
+            input.value = '';
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> Guardar';
+        }
+        
+        function renderizarTabs() {
+            const deportes = [...new Set(ejerciciosLista.map(e => e.categoria?.deporte).filter(Boolean))];
+            const container = document.getElementById('sportsTabs');
+            container.innerHTML = deportes.map((d, i) => `
+                <div class="sport-tab ${i === 0 ? 'active' : ''}" data-deporte="${d}">
+                    <i class="fas ${d === 'crossfit' ? 'fa-fire' : d === 'running' ? 'fa-running' : 'fa-medal'}"></i>
+                    ${d.toUpperCase()}
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('.sport-tab').forEach(tab => {
+                tab.onclick = () => {
+                    document.querySelectorAll('.sport-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    renderizarEjercicios(tab.dataset.deporte);
+                };
+            });
+            
+            if (deportes.length) renderizarEjercicios(deportes[0]);
+        }
+        
+        function renderizarEjercicios(deporte) {
+            const ejercicios = ejerciciosLista.filter(e => e.categoria?.deporte === deporte);
+            const porCategoria = {};
+            ejercicios.forEach(e => {
+                const cat = e.categoria?.nombre || 'General';
+                if (!porCategoria[cat]) porCategoria[cat] = [];
+                porCategoria[cat].push(e);
+            });
+            
+            let html = '';
+            for (const [categoria, lista] of Object.entries(porCategoria)) {
+                html += `
+                    <div class="category-card">
+                        <div class="category-header" onclick="this.classList.toggle('collapsed'); this.nextElementSibling.classList.toggle('collapsed')">
+                            <h3><i class="fas fa-folder-open"></i> ${categoria}</h3>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="category-content">
+                            <div class="exercises-grid">
+                                ${lista.map(ej => {
+                                    const record = getRecord(ej.id);
+                                    return `
+                                        <div class="exercise-card">
+                                            <div class="exercise-name">
+                                                ${ej.nombre}
+                                                <span class="badge">${ej.unidad_default || 'kg'}</span>
+                                            </div>
+                                            <div class="current-record">
+                                                <span><i class="fas fa-trophy"></i> Mejor marca</span>
+                                                <span class="record-value">${record ? `${record.valor} ${ej.unidad_default || 'kg'}` : 'No registrado'}</span>
+                                            </div>
+                                            ${record ? `<div class="record-date"><i class="fas fa-calendar-alt"></i> ${new Date(record.fecha_record).toLocaleDateString()}</div>` : ''}
+                                            <div class="input-group">
+                                                <input type="number" id="input_${ej.id}" step="0.5" placeholder="Nuevo récord...">
+                                                <button class="save-btn" id="btn_${ej.id}" onclick="window.guardarRecord(${ej.id}, '${ej.nombre.replace(/'/g, "\\'")}')">
+                                                    <i class="fas fa-save"></i> Guardar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            document.getElementById('recordsContainer').innerHTML = html || '<div class="empty-records">No hay ejercicios disponibles</div>';
+        }
+        
+        function mostrarNotificacion(mensaje, tipo) {
+            const notif = document.createElement('div');
+            notif.className = `notification ${tipo}`;
+            notif.innerHTML = `<i class="fas ${tipo === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${mensaje}`;
+            document.body.appendChild(notif);
+            setTimeout(() => {
+                notif.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notif.remove(), 300);
+            }, 3000);
+        }
+        
+        window.guardarRecord = guardarRecord;
+    </script>
+</body>
+</html>

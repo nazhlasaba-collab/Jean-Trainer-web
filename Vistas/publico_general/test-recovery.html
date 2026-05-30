@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Recuperación</title>
+    <style>
+        body {
+            font-family: monospace;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #000;
+            color: #fff;
+        }
+        .test-card {
+            background: #111;
+            border: 1px solid #FFD700;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            background: #000;
+            color: #fff;
+            border: 1px solid #FFD700;
+        }
+        button {
+            cursor: pointer;
+            background: #FFD700;
+            color: #000;
+            font-weight: bold;
+        }
+        .log {
+            background: #000;
+            border: 1px solid #333;
+            padding: 10px;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        .error {
+            color: #ff4444;
+        }
+        .success {
+            color: #00ff00;
+        }
+        .info {
+            color: #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Diagnóstico de Recuperación de Contraseña</h1>
+    
+    <div class="test-card">
+        <h3>📧 Probar Envío de Email</h3>
+        <input type="email" id="testEmail" placeholder="Ingresa un email registrado">
+        <button onclick="testResetPassword()">Enviar Email de Recuperación</button>
+    </div>
+    
+    <div class="test-card">
+        <h3>📋 Log de Diagnóstico</h3>
+        <div id="log" class="log"></div>
+    </div>
+    
+    <div class="test-card">
+        <h3>ℹ️ Información del Sistema</h3>
+        <div id="systemInfo"></div>
+    </div>
+    
+    <script type="module">
+        import { supabase, resetPassword } from './supabaseClient.js';
+        
+        function addLog(message, type = 'info') {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#ff4444' : type === 'success' ? '#00ff00' : '#FFD700';
+            const logEntry = document.createElement('div');
+            logEntry.style.color = color;
+            logEntry.style.margin = '5px 0';
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logDiv.appendChild(logEntry);
+            logDiv.scrollTop = logDiv.scrollHeight;
+            console.log(message);
+        }
+        
+        // Mostrar información del sistema
+        async function showSystemInfo() {
+            const infoDiv = document.getElementById('systemInfo');
+            const origin = window.location.origin;
+            const url = window.location.href;
+            
+            // Verificar configuración de Supabase
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                const hasSession = !!session;
+                
+                infoDiv.innerHTML = `
+                    <p><strong>URL Actual:</strong> ${url}</p>
+                    <p><strong>Origen:</strong> ${origin}</p>
+                    <p><strong>URL de restablecer:</strong> ${origin}/restablecer.html</p>
+                    <p><strong>Sesión activa:</strong> ${hasSession ? '✅ Sí' : '❌ No'}</p>
+                    <p><strong>Supabase URL:</strong> ${supabase.supabaseUrl}</p>
+                `;
+                
+                addLog(`✅ Información del sistema cargada. Origen: ${origin}`, 'success');
+            } catch (error) {
+                infoDiv.innerHTML = `<p class="error">Error obteniendo información: ${error.message}</p>`;
+                addLog(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Función de prueba
+        window.testResetPassword = async function() {
+            const email = document.getElementById('testEmail').value;
+            
+            if (!email) {
+                addLog('❌ Por favor ingresa un email', 'error');
+                return;
+            }
+            
+            addLog(`🔐 Iniciando prueba de recuperación para: ${email}`, 'info');
+            
+            try {
+                // Paso 1: Verificar si el usuario existe
+                addLog(`📡 Paso 1: Verificando si el usuario existe...`, 'info');
+                const { data: userCheck, error: checkError } = await supabase
+                    .from('usuarios')
+                    .select('email')
+                    .eq('email', email)
+                    .single();
+                
+                if (checkError && checkError.code === 'PGRST116') {
+                    addLog(`⚠️ Usuario no encontrado en la tabla "usuarios"`, 'error');
+                } else if (checkError) {
+                    addLog(`⚠️ Error verificando: ${checkError.message}`, 'error');
+                } else {
+                    addLog(`✅ Usuario encontrado en la base de datos`, 'success');
+                }
+                
+                // Paso 2: Intentar enviar email
+                addLog(`📧 Paso 2: Enviando email de recuperación...`, 'info');
+                const result = await resetPassword(email);
+                
+                if (result.success) {
+                    addLog(`✅ ¡ÉXITO! Email enviado a ${email}`, 'success');
+                    addLog(`📨 Revisa tu bandeja de entrada (y carpeta de spam)`, 'success');
+                } else {
+                    addLog(`❌ Error: ${result.error}`, 'error');
+                    
+                    // Intentar obtener más detalles del error
+                    try {
+                        const { error: testError } = await supabase.auth.resetPasswordForEmail(email);
+                        if (testError) {
+                            addLog(`🔍 Detalle adicional: ${testError.message} (Código: ${testError.status})`, 'error');
+                        }
+                    } catch (e) {
+                        addLog(`🔍 No se pudo obtener más detalles`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                addLog(`❌ Error inesperado: ${error.message}`, 'error');
+            }
+        };
+        
+        // Inicializar
+        showSystemInfo();
+        addLog('🚀 Herramienta de diagnóstico cargada', 'success');
+        addLog('💡 Ingresa un email registrado y haz clic en "Enviar Email"', 'info');
+    </script>
+</body>
+</html>

@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vaquero Entrenador - Registro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .register-container {
+            display: flex;
+            background-color: #111;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+            overflow: hidden;
+            max-width: 1100px;
+            width: 100%;
+            min-height: 600px;
+            border: 2px solid #333;
+        }
+        
+        .logo-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            border-right: 2px solid #FFD700;
+        }
+        
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        .logo-section h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-align: center;
+            z-index: 1;
+            color: #FFD700;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .logo-section p {
+            z-index: 1;
+            text-align: center;
+            color: #ccc;
+        }
+        
+        .form-section {
+            flex: 1.2;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .form-section h1 {
+            color: #FFD700;
+            font-size: 2.2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+            flex: 1;
+        }
+        
+        .form-group.full-width {
+            flex: 0 0 100%;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            background-color: #000;
+            border: 2px solid #333;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+        
+        .form-group input:focus {
+            border-color: #FFD700;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+        
+        .form-group label {
+            position: absolute;
+            left: 15px;
+            top: 14px;
+            color: #aaa;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            background-color: #111;
+            padding: 0 5px;
+        }
+        
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #FFD700;
+            font-weight: 600;
+        }
+        
+        .btn-register {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-register:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-register:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #ccc;
+        }
+        
+        .login-link a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .message-display {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .success-message {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border-left: 4px solid #27ae60;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .password-strength {
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        
+        .strength-bar {
+            height: 5px;
+            background-color: #333;
+            border-radius: 3px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 3px;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .register-container {
+                flex-direction: column;
+                max-width: 500px;
+                min-height: auto;
+            }
+            
+            .logo-section {
+                padding: 30px 20px;
+                min-height: 200px;
+                border-right: none;
+                border-bottom: 2px solid #FFD700;
+            }
+            
+            .logo-section h1 {
+                font-size: 2rem;
+            }
+            
+            .form-section {
+                padding: 30px 25px;
+                max-height: none;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .logo-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-section {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="register-container">
+        <div class="logo-section">
+            <i class="fas fa-dumbbell" style="font-size: 4rem; color: #FFD700; z-index: 1; margin-bottom: 20px;"></i>
+            <h1>Vaquero Entrenador</h1>
+            <p>Transforma tu cuerpo<br>Alcanza tus metas</p>
+        </div>
+        
+        <div class="form-section">
+            <h1>Crear Cuenta</h1>
+            
+            <!-- Contenedor para mensajes -->
+            <div id="messageContainer"></div>
+            
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="text" id="nombre" name="nombre" placeholder=" " required>
+                        <label for="nombre">
+                            <i class="fas fa-user"></i> Nombre
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="text" id="apellido" name="apellido" placeholder=" ">
+                        <label for="apellido">
+                            <i class="fas fa-user"></i> Apellido
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <input type="email" id="email" name="email" placeholder=" " required>
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email
+                    </label>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <input type="password" id="password" name="password" placeholder=" " required>
+                        <label for="password">
+                            <i class="fas fa-lock"></i> Contraseña
+                        </label>
+                        <div class="password-strength" id="passwordStrengthText"></div>
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="passwordStrengthBar"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder=" " required>
+                        <label for="confirmPassword">
+                            <i class="fas fa-lock"></i> Confirmar
+                        </label>
+                        <div class="password-strength" id="passwordMatchText"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <input type="tel" id="telefono" name="telefono" placeholder=" ">
+                    <label for="telefono">
+                        <i class="fas fa-phone"></i> Teléfono (Opcional)
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-register">
+                    <i class="fas fa-user-plus"></i> Crear Cuenta
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p>¿Ya tienes una cuenta?</p>
+                <a href="login.html">Iniciar Sesión</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+    import { registerUser, validateEmail } from './supabaseClient.js';
+    
+    function showMessage(text, type = 'error') {
+        const messageContainer = document.getElementById('messageContainer');
+        if (messageContainer) {
+            messageContainer.innerHTML = `
+                <div class="message-display ${type}-message">
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+                    ${text}
+                </div>
+            `;
+            
+            // Auto desaparecer después de 5 segundos (solo si no es error crítico)
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (messageContainer.firstChild) {
+                        messageContainer.innerHTML = '';
+                    }
+                }, 5000);
+            }
+        }
+    }
+    
+    // Medidor de fuerza de contraseña
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirmPassword');
+    const strengthBar = document.getElementById('passwordStrengthBar');
+    const strengthText = document.getElementById('passwordStrengthText');
+    const matchText = document.getElementById('passwordMatchText');
+    
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        if (password.length >= 6) strength++;
+        if (password.length >= 10) strength++;
+        if (/[A-Z]/.test(password)) strength++;
+        if (/[0-9]/.test(password)) strength++;
+        if (/[^A-Za-z0-9]/.test(password)) strength++;
+        
+        const percentage = (strength / 5) * 100;
+        strengthBar.style.width = percentage + '%';
+        
+        let color, text;
+        if (strength === 0) {
+            color = '#e74c3c';
+            text = 'Muy débil';
+        } else if (strength <= 2) {
+            color = '#e67e22';
+            text = 'Débil';
+        } else if (strength <= 3) {
+            color = '#f1c40f';
+            text = 'Media';
+        } else if (strength <= 4) {
+            color = '#2ecc71';
+            text = 'Fuerte';
+        } else {
+            color = '#27ae60';
+            text = 'Muy fuerte';
+        }
+        
+        strengthBar.style.backgroundColor = color;
+        strengthText.textContent = text;
+        strengthText.style.color = color;
+        return strength;
+    }
+    
+    function checkPasswordMatch() {
+        const password = passwordInput.value;
+        const confirm = confirmInput.value;
+        
+        if (confirm.length === 0) {
+            matchText.textContent = '';
+            return false;
+        }
+        
+        if (password === confirm) {
+            matchText.textContent = '✓ Las contraseñas coinciden';
+            matchText.style.color = '#27ae60';
+            return true;
+        } else {
+            matchText.textContent = '✗ Las contraseñas no coinciden';
+            matchText.style.color = '#e74c3c';
+            return false;
+        }
+    }
+    
+    passwordInput.addEventListener('input', () => {
+        checkPasswordStrength(passwordInput.value);
+        checkPasswordMatch();
+    });
+    
+    confirmInput.addEventListener('input', checkPasswordMatch);
+    
+    // Envío del formulario
+    document.getElementById('registerForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const nombre = document.getElementById('nombre').value.trim();
+        const apellido = document.getElementById('apellido').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const telefono = document.getElementById('telefono').value.trim();
+        
+        // Validaciones
+        if (!nombre) {
+            showMessage('Por favor, ingresa tu nombre', 'error');
+            return;
+        }
+        
+        if (!email) {
+            showMessage('Por favor, ingresa tu email', 'error');
+            return;
+        }
+        
+        if (!password) {
+            showMessage('Por favor, ingresa una contraseña', 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            showMessage('Las contraseñas no coinciden', 'error');
+            return;
+        }
+        
+        if (password.length < 6) {
+            showMessage('La contraseña debe tener al menos 6 caracteres', 'error');
+            return;
+        }
+        
+        if (!validateEmail(email)) {
+            showMessage('Por favor, ingresa un email válido', 'error');
+            return;
+        }
+        
+        // Deshabilitar botón durante el registro
+        const submitBtn = this.querySelector('button[type="submit"]');
+        const originalHTML = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
+        submitBtn.disabled = true;
+        
+        try {
+            const userData = {
+                nombre: nombre,
+                apellido: apellido,
+                telefono: telefono
+            };
+            
+            console.log('📝 Registrando usuario:', { email, nombre, apellido });
+            
+            const result = await registerUser(email, password, userData);
+            
+            if (!result.success) {
+                let errorMsg = result.error;
+                if (errorMsg.includes('already registered')) {
+                    errorMsg = 'Este email ya está registrado. ¿Quieres iniciar sesión?';
+                } else if (errorMsg.includes('password')) {
+                    errorMsg = 'La contraseña debe tener al menos 6 caracteres';
+                }
+                showMessage(errorMsg, 'error');
+                submitBtn.innerHTML = originalHTML;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            showMessage('✅ ¡Registro exitoso! Redirigiendo al dashboard...', 'success');
+            
+            // Guardar información adicional en localStorage
+            localStorage.setItem('userName', nombre);
+            localStorage.setItem('userEmail', email);
+            
+            // Redirigir después de 1.5 segundos
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+            
+        } catch (error) {
+            console.error('❌ Error en registro:', error);
+            showMessage('Error inesperado. Por favor, intenta nuevamente.', 'error');
+            submitBtn.innerHTML = originalHTML;
+            submitBtn.disabled = false;
+        }
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family:'Open Sans', sans-serif;
+}
+
+body{
+    height: 100vh;
+    background-color: #b10a0a;
+}
+
+.links li {
+    list-style: none;
+}
+
+.links a {
+    text-decoration: none;
+    color: #fff;
+    font-size: 1rem;
+}
+ 
+.links li a:hover {
+    color:#8d5c15;
+}

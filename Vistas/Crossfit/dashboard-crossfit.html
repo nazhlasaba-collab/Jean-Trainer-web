@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Crossfit - Jean Trainer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #000;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            border-bottom: 2px solid #FFD700;
+        }
+
+        .navbar {
+            height: 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .user-menu-container {
+            position: relative;
+        }
+
+        .user-btn {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .user-btn:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #000;
+            border: 2px solid #FFD700;
+            border-radius: 10px;
+            width: 280px;
+            margin-top: 10px;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .user-dropdown.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .menu-items {
+            padding: 20px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .menu-item:hover {
+            background-color: rgba(255, 215, 0, 0.1);
+            color: #FFD700;
+            border-left: 3px solid #FFD700;
+        }
+
+        .menu-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #FFD700;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background-color: #333;
+            margin: 10px 20px;
+        }
+
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 30px 50px;
+        }
+
+        .crossfit-hero {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 40px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            border-radius: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .crossfit-hero h1 {
+            font-size: 2.8rem;
+            color: #FFD700;
+            margin-bottom: 15px;
+        }
+
+        .crossfit-hero p {
+            font-size: 1.2rem;
+            color: #ccc;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .user-name {
+            color: #FFD700;
+            font-weight: 700;
+        }
+
+        .crossfit-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            color: #FFD700;
+            font-weight: 600;
+            margin: 10px;
+        }
+
+        .cards-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background-color: #FFD700;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background-color: #111;
+            border-radius: 15px;
+            padding: 35px 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: #FFD700;
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.15);
+        }
+
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background-color: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .card-icon i {
+            font-size: 2.5rem;
+            color: #FFD700;
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #aaa;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .card-btn {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 80%;
+            margin-top: auto;
+        }
+
+        .card-btn:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+        }
+
+        .deuda-alert {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid #ff6b6b;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #ff6b6b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+        }
+
+        .loading-spinner {
+            font-size: 3rem;
+            color: #FFD700;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 0 20px; }
+            .dashboard-content { padding: 100px 20px 30px; }
+            .crossfit-hero h1 { font-size: 2.2rem; }
+            .crossfit-hero { padding: 30px 20px; }
+            .cards-grid { grid-template-columns: 1fr; }
+            .section-title { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 576px) {
+            .logo { font-size: 1.4rem; }
+            .user-btn { padding: 8px 20px; font-size: 0.9rem; }
+            .card { padding: 25px 20px; }
+            .crossfit-hero h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="inicio.html">Athlex</a></div>
+            <div class="user-menu-container">
+                <button class="user-btn" id="userBtn">
+                    <i class="fas fa-dumbbell"></i>
+                    <span>Menú</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="menu-items">
+                        <div class="menu-item" id="menuMyProfile">
+                            <i class="fas fa-user-circle"></i>
+                            <span>Mi Perfil</span>
+                        </div>
+                        <div class="menu-item" id="menuMyRoutines">
+                            <i class="fas fa-running"></i>
+                            <span>Mis Rutinas</span>
+                        </div>
+                        <div class="menu-item" id="menuMyRecord">
+                            <i class="fas fa-trophy"></i>
+                            <span>Mi Récord Personal</span>
+                        </div>
+                        <div class="menu-item" id="menuPayMembership">
+                            <i class="fas fa-credit-card"></i>
+                            <span>Pagar Membresía</span>
+                        </div>
+                        <div class="menu-divider"></div>
+                        <div class="menu-item" id="logoutLink">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Cerrar Sesión</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-content">
+        <div id="loadingState" class="loading">
+            <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
+            <p>Cargando tu información...</p>
+        </div>
+
+        <div id="dashboardContent" style="display: none;">
+            <section class="crossfit-hero">
+                <h1>¡HOLA, <span class="user-name" id="userName">Atleta</span>!</h1>
+                <p>Bienvenido a tu zona de entrenamiento. Gestiona tu perfil, rutinas, récords y pagos desde aquí.</p>
+                <div>
+                    <span class="crossfit-badge" id="membershipBadge">
+                        <i class="fas fa-dumbbell"></i> Crossfit
+                    </span>
+                    <span class="crossfit-badge" id="statusBadge">
+                        <i class="fas fa-spinner"></i> Verificando...
+                    </span>
+                </div>
+            </section>
+
+            <section class="cards-section">
+                <h2 class="section-title">Tus Herramientas</h2>
+                <div class="cards-grid">
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <h3>Mi Perfil</h3>
+                        <p>Administra tu información personal, fotografía, objetivos y configuración de cuenta.</p>
+                        <button class="card-btn" id="cardMyProfile">Ver Mi Perfil</button>
+                    </div>
+                    
+                    <div class="card" id="cardRutinasContainer">
+                        <div class="card-icon">
+                            <i class="fas fa-running"></i>
+                        </div>
+                        <h3>Mis Rutinas</h3>
+                        <p>Consulta tus rutinas asignadas, WODs diarios y planes de entrenamiento personalizados.</p>
+                        <button class="card-btn" id="cardMyRoutines">Ver Rutinas</button>
+                        <div id="deudaAlert" style="display: none;" class="deuda-alert">
+                            <i class="fas fa-exclamation-circle"></i> ⚠️ Tienes deuda - Paga para ver rutinas
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <h3>Mi Récord Personal</h3>
+                        <p>Registra y consulta tus mejores marcas, progreso y logros en cada ejercicio.</p>
+                        <button class="card-btn" id="cardMyRecord">Ver Récords</button>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h3>Pagar Membresía</h3>
+                        <p>Gestiona tu membresía, realiza pagos y consulta tu historial de facturación.</p>
+                        <button class="card-btn" id="cardPayMembership">Pagar Ahora</button>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "@supabase/supabase-js": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { createClient } from '@supabase/supabase-js';
+
+        const supabaseUrl = 'https://iketdpkxyojqxruzzrgy.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlrZXRkcGt4eW9qcXhydXp6cmd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5ODMwNTcsImV4cCI6MjA4NTU1OTA1N30.974zKW2EMNMuCndTC6_g5zZP3mN2XZLlDsmsz8602Lk';
+        const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+        let currentUser = null;
+        let membresiaActiva = false;
+        let fechaExpiracion = null;
+        let planNombre = null;  // CAMBIADO: antes era tipoMembresia, ahora es planNombre
+
+        async function verificarMembresia() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                if (error || !user) return false;
+                currentUser = user;
+                
+                // CORREGIDO: usar plan_nombre en lugar de tipo
+                const { data: membresia, error: memError } = await supabase
+                    .from('membresias')
+                    .select('estado, fecha_expiracion, plan_nombre')
+                    .eq('id_usuario', user.id)
+                    .order('created_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                
+                if (memError || !membresia) {
+                    membresiaActiva = false;
+                    planNombre = null;
+                    fechaExpiracion = null;
+                    console.log('No se encontró membresía');
+                    return false;
+                }
+                
+                planNombre = membresia.plan_nombre;
+                fechaExpiracion = membresia.fecha_expiracion;
+                
+                if (membresia.estado === 'activo' && fechaExpiracion) {
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    const expiracion = new Date(fechaExpiracion);
+                    expiracion.setHours(0, 0, 0, 0);
+                    
+                    if (expiracion >= hoy) {
+                        membresiaActiva = true;
+                        console.log('Membresía activa:', planNombre);
+                        return true;
+                    } else {
+                        membresiaActiva = false;
+                        await supabase
+                            .from('membresias')
+                            .update({ estado: 'suspendido' })
+                            .eq('id_usuario', user.id);
+                        return false;
+                    }
+                }
+                membresiaActiva = false;
+                return false;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                return false;
+            }
+        }
+
+        function mostrarModalDeuda() {
+            const modalExistente = document.getElementById('modal-deuda');
+            if (modalExistente) modalExistente.remove();
+            
+            const modalDeuda = document.createElement('div');
+            modalDeuda.id = 'modal-deuda';
+            modalDeuda.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.95);
+                backdrop-filter: blur(8px);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+            `;
+            
+            modalDeuda.innerHTML = `
+                <div style="background: linear-gradient(145deg, #1a1a1a, #0a0a0a); border-radius: 25px; padding: 45px 35px; max-width: 500px; width: 90%; text-align: center; border: 2px solid #FFD700;">
+                    <div style="width: 80px; height: 80px; background: rgba(255,107,107,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; border: 2px solid #ff6b6b;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ff6b6b;"></i>
+                    </div>
+                    <h2 style="color: #FFD700; font-size: 1.8rem; margin-bottom: 15px;">⚠️ ¡TIENES DEUDA!</h2>
+                    <p style="color: #e0e0e0; font-size: 1.1rem; margin-bottom: 15px;">Tu membresía no está al día. Para acceder a las rutinas, debes pagar tu mensualidad.</p>
+                    ${fechaExpiracion ? `<p style="color: #ff6b6b; margin-bottom: 20px;"><i class="fas fa-calendar-times"></i> Vencida desde: ${new Date(fechaExpiracion).toLocaleDateString('es-ES')}</p>` : ''}
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button id="btnPagarAhora" style="background: #FFD700; color: #000; border: none; padding: 14px 30px; border-radius: 50px; font-weight: 800; cursor: pointer;">
+                            <i class="fas fa-credit-card"></i> PAGAR AHORA
+                        </button>
+                        <button id="btnCerrarModal" style="background: transparent; color: #FFD700; border: 2px solid #FFD700; padding: 14px 30px; border-radius: 50px; font-weight: 700; cursor: pointer;">
+                            CERRAR
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modalDeuda);
+            
+            document.getElementById('btnPagarAhora').onclick = () => {
+                window.location.href = 'ver-planes.html';
+            };
+            document.getElementById('btnCerrarModal').onclick = () => {
+                modalDeuda.remove();
+            };
+            modalDeuda.onclick = (e) => {
+                if (e.target === modalDeuda) modalDeuda.remove();
+            };
+        }
+
+        async function actualizarUI() {
+            const statusBadge = document.getElementById('statusBadge');
+            const deudaAlert = document.getElementById('deudaAlert');
+            const membershipBadge = document.getElementById('membershipBadge');
+            
+            await verificarMembresia();
+            
+            // Mostrar el nombre del plan
+            if (planNombre) {
+                membershipBadge.innerHTML = `<i class="fas fa-dumbbell"></i> ${planNombre}`;
+            } else {
+                membershipBadge.innerHTML = `<i class="fas fa-dumbbell"></i> Sin membresía`;
+            }
+            
+            if (membresiaActiva && fechaExpiracion) {
+                const expiracion = new Date(fechaExpiracion);
+                const hoy = new Date();
+                const diasRestantes = Math.ceil((expiracion - hoy) / (1000 * 60 * 60 * 24));
+                
+                if (diasRestantes <= 7) {
+                    statusBadge.innerHTML = `<i class="fas fa-clock"></i> Por vencer (${diasRestantes} días)`;
+                    statusBadge.style.backgroundColor = 'rgba(255, 193, 7, 0.2)';
+                    statusBadge.style.color = '#FFC107';
+                } else {
+                    statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> Membresía Activa`;
+                    statusBadge.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    statusBadge.style.color = '#4CAF50';
+                }
+                if (deudaAlert) deudaAlert.style.display = 'none';
+            } else {
+                statusBadge.innerHTML = `<i class="fas fa-exclamation-circle"></i> Membresía Suspendida`;
+                statusBadge.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                statusBadge.style.color = '#F44336';
+                if (deudaAlert) deudaAlert.style.display = 'flex';
+            }
+        }
+
+        function setupEventListeners() {
+            // CORREGIDO: Redirige a ver-rutina.html directamente
+            const handleRutinasClick = async (e) => {
+                e.preventDefault();
+                await verificarMembresia();
+                
+                if (membresiaActiva) {
+                    window.location.href = 'ver-rutina.html';
+                } else {
+                    mostrarModalDeuda();
+                }
+            };
+            
+            // Botón de la tarjeta "Mis Rutinas"
+            const btnRutinas = document.getElementById('cardMyRoutines');
+            if (btnRutinas) btnRutinas.addEventListener('click', handleRutinasClick);
+            
+            // Opción del menú desplegable "Mis Rutinas"
+            const menuRutinas = document.getElementById('menuMyRoutines');
+            if (menuRutinas) menuRutinas.addEventListener('click', handleRutinasClick);
+            
+            // Botón "Pagar Membresía" - Tarjeta
+            const btnPagar = document.getElementById('cardPayMembership');
+            if (btnPagar) {
+                btnPagar.addEventListener('click', () => {
+                    window.location.href = 'ver-planes.html';
+                });
+            }
+            
+            // Opción del menú "Pagar Membresía"
+            const menuPagar = document.getElementById('menuPayMembership');
+            if (menuPagar) {
+                menuPagar.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'ver-planes.html';
+                });
+            }
+            
+            // Botón "Mi Perfil" - Tarjeta
+            const btnPerfil = document.getElementById('cardMyProfile');
+            if (btnPerfil) {
+                btnPerfil.addEventListener('click', () => {
+                    window.location.href = 'verperfil.html';
+                });
+            }
+            
+            // Opción del menú "Mi Perfil"
+            const menuPerfil = document.getElementById('menuMyProfile');
+            if (menuPerfil) {
+                menuPerfil.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'verperfil.html';
+                });
+            }
+            
+            // Botón "Mi Récord Personal" - Tarjeta
+            const btnRecord = document.getElementById('cardMyRecord');
+            if (btnRecord) {
+                btnRecord.addEventListener('click', () => {
+                    window.location.href = 'mis-records.html';
+                });
+            }
+            
+            // Opción del menú "Mi Récord Personal"
+            const menuRecord = document.getElementById('menuMyRecord');
+            if (menuRecord) {
+                menuRecord.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = 'mis-records.html';
+                });
+            }
+            
+            // Menú desplegable del usuario
+            const userBtn = document.getElementById('userBtn');
+            const userDropdown = document.getElementById('userDropdown');
+            
+            if (userBtn && userDropdown) {
+                userBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('active');
+                });
+                
+                document.addEventListener('click', (e) => {
+                    if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Cerrar sesión
+            const logoutLink = document.getElementById('logoutLink');
+            if (logoutLink) {
+                logoutLink.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    await supabase.auth.signOut();
+                    window.location.href = '../publico_general/index.html';
+                });
+            }
+        }
+
+        async function init() {
+            try {
+                const { data: { user }, error } = await supabase.auth.getUser();
+                
+                if (error || !user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                currentUser = user;
+                
+                const { data: userData } = await supabase
+                    .from('usuarios')
+                    .select('nombre, apellido')
+                    .eq('id_usuario', user.id)
+                    .single();
+                
+                if (userData) {
+                    const fullName = `${userData.nombre || ''} ${userData.apellido || ''}`.trim();
+                    document.getElementById('userName').textContent = fullName || 'Atleta';
+                }
+                
+                await actualizarUI();
+                setupEventListeners();
+                
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div style="color: #ff6b6b;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem;"></i>
+                        <p>Error: ${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #FFD700; color: #000; border: none; border-radius: 5px; cursor: pointer;">Reintentar</button>
+                    </div>
+                `;
+            }
+        }
+        
+        init();
+    </script>
+</body>
+</html>

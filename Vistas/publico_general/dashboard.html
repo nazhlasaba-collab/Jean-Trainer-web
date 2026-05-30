@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Dashboard - Vaquero Entrenador</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        header {
+            background-color: #000;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid #FFD700;
+        }
+
+        .navbar {
+            height: 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .user-btn {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 25px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-btn:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+        }
+
+        .user-btn.logout-emergency {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .user-btn.logout-emergency:hover {
+            background-color: #c0392b;
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            backdrop-filter: blur(5px);
+        }
+
+        .loading-content {
+            text-align: center;
+            padding: 40px;
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 30px;
+            border: 2px solid #FFD700;
+            max-width: 500px;
+            margin: 20px;
+        }
+
+        .loading-content i {
+            font-size: 4rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-content h2 {
+            color: #FFD700;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
+        .loading-content p {
+            color: #ccc;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .loading-progress {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .loading-progress-bar {
+            height: 100%;
+            background: #FFD700;
+            width: 0%;
+            animation: progress 2s ease infinite;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            50% { width: 100%; }
+            100% { width: 0%; }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Contenido */
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 30px 50px;
+        }
+
+        /* Hero Section - Bienvenida */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 60px 40px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            border-radius: 30px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+        }
+
+        .hero-section h1 {
+            font-size: 3.5rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            position: relative;
+            font-weight: 800;
+        }
+
+        .hero-section .welcome-name {
+            color: #fff;
+            text-decoration: underline;
+            text-underline-offset: 8px;
+        }
+
+        .hero-section p {
+            font-size: 1.3rem;
+            color: #ccc;
+            max-width: 900px;
+            margin: 0 auto 30px;
+            position: relative;
+            line-height: 1.8;
+        }
+
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .hero-stat {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .hero-stat i {
+            font-size: 1.8rem;
+            color: #FFD700;
+        }
+
+        .hero-stat span {
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        /* Sección Acerca de */
+        .about-section {
+            margin-bottom: 60px;
+            padding: 40px;
+            background: #111;
+            border-radius: 20px;
+            border: 1px solid #333;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title i {
+            font-size: 2rem;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+        }
+
+        .about-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .about-item i {
+            font-size: 1.5rem;
+            color: #FFD700;
+            margin-top: 5px;
+        }
+
+        .about-item h3 {
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .about-item p {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Tarjetas de Acceso Rápido */
+        .quick-access {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .quick-card {
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 20px;
+            padding: 50px 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid #333;
+            text-decoration: none;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-10px);
+            border-color: #FFD700;
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .quick-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .quick-card:hover::after {
+            opacity: 1;
+        }
+
+        .quick-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-card:hover .quick-icon {
+            transform: scale(1.1);
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .quick-icon i {
+            font-size: 3.5rem;
+            color: #FFD700;
+        }
+
+        .quick-card h2 {
+            font-size: 2rem;
+            color: #FFD700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-card p {
+            color: #ccc;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .quick-badge {
+            display: inline-block;
+            background: rgba(255, 215, 0, 0.2);
+            color: #FFD700;
+            padding: 10px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        /* Alertas */
+        .alert {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease;
+            z-index: 2000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+
+        .alert-success {
+            background: rgba(39, 174, 96, 0.95);
+            border: 2px solid #27ae60;
+            color: white;
+        }
+
+        .alert-error {
+            background: rgba(231, 76, 60, 0.95);
+            border: 2px solid #e74c3c;
+            color: white;
+        }
+
+        .alert-info {
+            background: rgba(52, 152, 219, 0.95);
+            border: 2px solid #3498db;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .dashboard-content {
+                padding: 100px 20px 30px;
+            }
+
+            .hero-section h1 {
+                font-size: 2.2rem;
+            }
+
+            .hero-section {
+                padding: 40px 20px;
+            }
+
+            .quick-access {
+                grid-template-columns: 1fr;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-stats {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .hero-stat {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .alert {
+                top: auto;
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo {
+                font-size: 1.4rem;
+            }
+            
+            .user-btn {
+                padding: 8px 20px;
+                font-size: 0.9rem;
+            }
+
+            .hero-section h1 {
+                font-size: 1.8rem;
+            }
+
+            .quick-card {
+                padding: 40px 20px;
+            }
+
+            .quick-icon {
+                width: 100px;
+                height: 100px;
+            }
+
+            .quick-icon i {
+                font-size: 3rem;
+            }
+
+            .quick-card h2 {
+                font-size: 1.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADING OVERLAY - Se muestra mientras redirige -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <i class="fas fa-spinner fa-spin"></i>
+            <h2>Verificando tu membresía</h2>
+            <p>Estamos preparando tu dashboard personalizado. Esto tomará solo unos segundos...</p>
+            <div class="loading-progress">
+                <div class="loading-progress-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="dashboard.html">Athlex</a></div>
+            <div style="display: flex; gap: 10px;">
+                <button class="user-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+                <button class="user-btn logout-emergency" id="logoutEmergencyBtn">
+                    <i class="fas fa-exclamation-triangle"></i> Salir Ahora
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-content">
+        <!-- HERO SECTION - BIENVENIDA PERSONALIZADA -->
+        <section class="hero-section">
+            <h1>
+                ¡Bienvenido, 
+                <span class="welcome-name" id="userNameDisplay">Usuario</span>!
+            </h1>
+            <p>
+                Athlex es tu plataforma de entrenamiento personalizado. 
+                Aquí encontrarás planes diseñados específicamente para tus objetivos, 
+                ya sea Crossfit, Running, Hyrox o un plan completamente personalizado.
+            </p>
+            
+        </section>
+
+        <!-- ACERCA DE VAQUERO ENTRENADOR -->
+        <section class="about-section">
+            <h2 class="section-title">
+                <i class="fas fa-info-circle"></i>
+                ¿Qué es Vaquero Entrenador?
+            </h2>
+            <div class="about-content">
+                <div class="about-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3>Entrenamiento Personalizado</h3>
+                        <p>Cada plan es adaptado a tu nivel, experiencia y objetivos específicos. No hay dos atletas iguales.</p>
+                    </div>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3>Seguimiento Profesional</h3>
+                        <p>Monitoreo constante de tu progreso y ajustes semanales para maximizar resultados.</p>
+                    </div>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3>Metodología Comprobada</h3>
+                        <p>Más de 5 años de experiencia entrenando atletas de todos los niveles, desde principiantes hasta competidores.</p>
+                    </div>
+                </div>
+                <div class="about-item">
+                    <i class="fas fa-check-circle"></i>
+                    <div>
+                        <h3>Comunidad Activa</h3>
+                        <p>Forma parte de una comunidad de atletas motivados que comparten tus mismas metas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ACCESO RÁPIDO -->
+        <h2 style="font-size: 2rem; color: #FFD700; margin-bottom: 30px; text-align: center;">
+            <i class="fas fa-rocket"></i> Comienza Aquí
+        </h2>
+        
+        <div class="quick-access">
+            <!-- TARJETA 1: MI PERFIL -->
+            <a href="mi-perfil.html" class="quick-card">
+                <div class="quick-icon">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2>Mi Perfil</h2>
+                <p>Administra tu información personal, configura tus preferencias y mantén tus datos actualizados</p>
+                <span class="quick-badge">
+                    <i class="fas fa-arrow-right"></i> Ir a Mi Perfil
+                </span>
+            </a>
+
+            <!-- TARJETA 2: VER PLANES -->
+            <a href="ver-planes.html" class="quick-card">
+                <div class="quick-icon">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h2>Ver Planes</h2>
+                <p>Explora todos los planes disponibles y encuentra el entrenamiento perfecto para alcanzar tus metas</p>
+                <span class="quick-badge">
+                    <i class="fas fa-arrow-right"></i> Ver Planes
+                </span>
+            </a>
+        </div>
+
+        <!-- MENSAJE DE CIERRE INSPIRACIONAL -->
+        <div style="text-align: center; margin-top: 60px; padding: 40px; background: rgba(255, 215, 0, 0.05); border-radius: 20px;">
+            <i class="fas fa-quote-right" style="font-size: 2rem; color: #FFD700; opacity: 0.5; margin-bottom: 20px;"></i>
+            <p style="font-size: 1.3rem; color: #FFD700; font-style: italic; max-width: 800px; margin: 0 auto;">
+                "El éxito no es casualidad. Es trabajo duro, perseverancia, aprendizaje, sacrificio y sobre todo, amor por lo que haces."
+            </p>
+            <p style="color: #ccc; margin-top: 20px;">— Vaquero Entrenador</p>
+        </div>
+    </main>
+
+    <script type="module">
+    import { supabase } from './supabaseClient.js';
+
+    // Función para mostrar alertas
+    function mostrarAlerta(mensaje, tipo = 'success') {
+        const alerta = document.createElement('div');
+        alerta.className = `alert alert-${tipo}`;
+        alerta.innerHTML = `
+            <i class="fas ${tipo === 'success' ? 'fa-check-circle' : tipo === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <span>${mensaje}</span>
+        `;
+        
+        document.body.appendChild(alerta);
+        
+        setTimeout(() => alerta.remove(), 5000);
+    }
+
+    (async function() {
+        try {
+            // Mostrar loading
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            const { data: { user }, error } = await supabase.auth.getUser();
+            
+            if (error || !user) {
+                console.log('❌ No hay sesión');
+                window.location.replace('login.html');
+                return;
+            }
+
+            // Mostrar nombre del usuario
+            const nombre = localStorage.getItem('userName') || user.email?.split('@')[0] || 'Usuario';
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            if (userNameDisplay) {
+                userNameDisplay.textContent = nombre;
+            }
+            
+            console.log('✅ Sesión activa:', user.email);
+
+            // ============================================
+            // VERIFICAR MEMBRESÍA USANDO plan_nombre (no tipo)
+            // ============================================
+            
+            // Buscar cualquier membresía activa y vigente usando plan_nombre
+            const { data: membresia, error: membError } = await supabase
+                .from('membresias')
+                .select('plan_nombre, fecha_siguiente_pago, estado, fecha_expiracion')
+                .eq('id_usuario', user.id)
+                .eq('estado', 'activo')
+                .maybeSingle();
+
+            if (membError) {
+                console.error('Error al buscar membresía:', membError);
+                throw membError;
+            }
+
+            // Verificar si tiene membresía activa
+            if (!membresia || !membresia.plan_nombre) {
+                console.log('ℹ️ Usuario sin membresía activa - Mostrando dashboard informativo');
+                loadingOverlay.style.display = 'none';
+                return;
+            }
+
+            // Verificar si la membresía está vigente (no vencida)
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            
+            let fechaVencimiento = membresia.fecha_expiracion || membresia.fecha_siguiente_pago;
+            
+            if (fechaVencimiento) {
+                const vence = new Date(fechaVencimiento);
+                vence.setHours(0, 0, 0, 0);
+                
+                if (vence < hoy) {
+                    console.log('⚠️ Membresía vencida - Mostrando alerta');
+                    loadingOverlay.style.display = 'none';
+                    mostrarAlerta('Tu membresía está vencida. Renueva para acceder a tus rutinas.', 'error');
+                    return;
+                }
+            }
+
+            // ✅ TIENE MEMBRESÍA ACTIVA Y VIGENTE - REDIRIGIR A dashboard-crossfit.html
+            console.log('🟢 Usuario con membresía activa:', membresia.plan_nombre);
+            console.log('🚀 Redirigiendo a dashboard-crossfit.html');
+            
+            // Pequeña pausa para mostrar el loading
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            // Redirigir a dashboard-crossfit.html para TODOS los usuarios con membresía
+            window.location.href = '../Crossfit/dashboard-crossfit.html';
+
+        } catch (error) {
+            console.error('❌ Error:', error);
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            if (loadingOverlay) loadingOverlay.style.display = 'none';
+            mostrarAlerta('Error al verificar tu membresía: ' + error.message, 'error');
+        }
+    })();
+
+    // Logout normal
+    document.getElementById('logoutBtn')?.addEventListener('click', async function(e) {
+        e.preventDefault();
+        if (!confirm('¿Cerrar sesión?')) return;
+        
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Cerrando...';
+        this.disabled = true;
+        
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {}
+        
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    });
+
+    // Logout de emergencia (sin confirmación)
+    document.getElementById('logoutEmergencyBtn')?.addEventListener('click', async function() {
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        this.disabled = true;
+        
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {}
+        
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.href = 'login.html';
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Dashboard Admin - Jean Trainer</title>
+    <style>
+        /* (Mantengo todo tu CSS exactamente igual) */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            color: #fff;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header & Navbar */
+        header {
+            background-color: #000;
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+            top: 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border-bottom: 2px solid #FFD700;
+        }
+
+        .navbar {
+            height: 80px;
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #FFD700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .logo a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .user-menu-container {
+            position: relative;
+        }
+
+        .user-btn {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .user-btn:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        .user-btn i {
+            font-size: 1.3rem;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            background-color: #111;
+            border: 2px solid #FFD700;
+            border-radius: 15px;
+            width: 320px;
+            display: none;
+            z-index: 1001;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        .user-dropdown.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-header {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            padding: 20px;
+            border-bottom: 1px solid #333;
+        }
+
+        .menu-header h3 {
+            color: #FFD700;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+
+        .menu-header p {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .menu-items {
+            padding: 15px 0;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 18px 25px;
+            text-decoration: none;
+            color: #fff;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+            position: relative;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.1), transparent);
+            color: #FFD700;
+            border-left: 4px solid #FFD700;
+            padding-left: 30px;
+        }
+
+        .menu-item i {
+            width: 24px;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #FFD700;
+        }
+
+        .menu-item span {
+            flex-grow: 1;
+            font-weight: 600;
+        }
+
+        .menu-item .badge {
+            background-color: #FFD700;
+            color: #000;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-left: 10px;
+        }
+
+        .menu-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #333, transparent);
+            margin: 10px 25px;
+        }
+
+        /* Dashboard Admin Content */
+        .dashboard-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 120px 30px 50px;
+        }
+
+        /* Bienvenida */
+        .welcome-section {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            border-radius: 20px;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .welcome-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 215, 0, 0.05) 0%, transparent 70%);
+        }
+
+        .welcome-section h1 {
+            font-size: 3rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .welcome-section p {
+            font-size: 1.2rem;
+            color: #ccc;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .admin-name {
+            color: #FFD700;
+            font-weight: 700;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        /* Tarjetas de Funcionalidades */
+        .cards-section {
+            margin-bottom: 60px;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            color: #FFD700;
+            margin-bottom: 40px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 150px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+            border-radius: 2px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+            border-color: #FFD700;
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover .card-icon {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 215, 0, 0.15));
+        }
+
+        .card-icon i {
+            font-size: 3rem;
+            color: #FFD700;
+        }
+
+        .card h3 {
+            font-size: 1.6rem;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .card p {
+            color: #aaa;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .card-btn {
+            background: linear-gradient(135deg, #FFD700, #FFC400);
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 35px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 80%;
+            margin-top: auto;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .card-btn:hover {
+            background: linear-gradient(135deg, #FFC400, #FFB300);
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Estadísticas */
+        .stats-section {
+            margin-bottom: 60px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+        }
+
+        .stat-card {
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 20px;
+            padding: 35px 25px;
+            text-align: center;
+            border: 1px solid #222;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: #FFD700;
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.1);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-card i {
+            font-size: 3rem;
+            color: #FFD700;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .stat-card p {
+            color: #aaa;
+            font-size: 1.1rem;
+            position: relative;
+        }
+
+        /* Actividad Reciente */
+        .activity-section {
+            margin-bottom: 60px;
+        }
+
+        .activity-list {
+            background: linear-gradient(145deg, #111, #0a0a0a);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid #222;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 1px solid #222;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .activity-item:hover {
+            background: linear-gradient(90deg, rgba(255, 215, 0, 0.05), transparent);
+            transform: translateX(10px);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .activity-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(255, 215, 0, 0.05));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 25px;
+            flex-shrink: 0;
+        }
+
+        .activity-icon i {
+            color: #FFD700;
+            font-size: 1.5rem;
+        }
+
+        .activity-content {
+            flex-grow: 1;
+        }
+
+        .activity-content h4 {
+            color: #fff;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+
+        .activity-content p {
+            color: #aaa;
+            font-size: 1rem;
+        }
+
+        .activity-time {
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            margin-left: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 20px;
+            }
+            
+            .user-dropdown {
+                position: fixed;
+                top: 80px;
+                right: 0;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+
+            .dashboard-content {
+                padding: 100px 20px 30px;
+            }
+
+            .welcome-section h1 {
+                font-size: 2.2rem;
+            }
+
+            .welcome-section {
+                padding: 30px 20px;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .card {
+                padding: 30px 20px;
+            }
+
+            .activity-item {
+                flex-direction: column;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .activity-icon {
+                margin-right: 0;
+                margin-bottom: 15px;
+            }
+
+            .activity-time {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .logo {
+                font-size: 1.4rem;
+            }
+            
+            .user-btn {
+                padding: 10px 20px;
+                font-size: 0.95rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-section h1 {
+                font-size: 1.8rem;
+            }
+
+            .user-dropdown {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header con menú de usuario ADMIN -->
+    <header>
+        <div class="navbar">
+            <div class="logo"><a href="index.html">Athlex</a></div>
+            <div class="user-menu-container">
+                <button class="user-btn" id="userBtn">
+                    <i class="fas fa-user-cog"></i>
+                    <span id="adminName">Administrador</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="menu-header">
+                        <h3>Panel de Administración</h3>
+                        <p>Gestiona todos los aspectos del sistema</p>
+                    </div>
+                    <div class="menu-items">
+                        <!-- Menú del administrador - RUTAS CORREGIDAS -->
+                        <a href="../Admin/register-user.html" class="menu-item" id="menuRegisterUser">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Registrar Usuario</span>
+                            <span class="badge">Nuevo</span>
+                        </a>
+                        <a href="../Admin/verify-payments.html" class="menu-item" id="menuVerifyPayments">
+                            <i class="fas fa-money-check-alt"></i>
+                            <span>Verificar Pagos</span>
+                            <span class="badge">8</span>
+                        </a>
+                        <a href="../Admin/register-routines.html" class="menu-item" id="menuRegisterRoutines">
+                            <i class="fas fa-dumbbell"></i>
+                            <span>Registrar Rutinas</span>
+                        </a>
+                        <a href="../Admin/view-user.html" class="menu-item" id="menuViewUsers">
+                            <i class="fas fa-users"></i>
+                            <span>Ver Usuarios</span>
+                        </a>
+                        <a href="../Admin/view-routines.html" class="menu-item" id="menuRegisterRoutines">
+                            <i class="fas fa-dumbbell"></i>
+                            <span>Ver Rutinas</span>
+                        </a>
+                        <a href="../Admin/crearplan.html" class="menu-item" id="menuRegisterUser">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Gestionar planes</span>
+                        </a>
+                        <div class="menu-divider"></div>
+                        <!-- Opción para cerrar sesión -->
+                        <a href="#" class="menu-item" id="logoutLink">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Cerrar Sesión</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido principal del dashboard -->
+    <main class="dashboard-content">
+        <!-- Sección de Bienvenida -->
+        <section class="welcome-section">
+            <h1>¡Bienvenido, <span class="admin-name" id="adminFullName">Administrador</span>!</h1>
+            <p>Desde este panel puedes gestionar todos los aspectos del sistema Jean Trainer. Controla usuarios, pagos, rutinas y monitorea la actividad del gimnasio.</p>
+            <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+                <div style="display: inline-block; padding: 10px 25px; background-color: rgba(255, 215, 0, 0.15); border-radius: 20px; color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.3);">
+                    <i class="fas fa-calendar-alt"></i> <span id="currentDate"></span>
+                </div>
+                <div style="display: inline-block; padding: 10px 25px; background-color: rgba(255, 215, 0, 0.15); border-radius: 20px; color: #FFD700; border: 1px solid rgba(255, 215, 0, 0.3);">
+                    <i class="fas fa-clock"></i> <span id="currentTime"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tarjetas de Funcionalidades -->
+        <section class="cards-section">
+            <h2 class="section-title">Funcionalidades Principales</h2>
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>Registrar Usuario</h3>
+                    <p>Agrega nuevos usuarios al sistema, asigna permisos y configura sus datos personales.</p>
+                    <a href="../Admin/register-user.html" class="card-btn" id="cardRegisterUser">Registrar Usuario</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-money-check-alt"></i>
+                    </div>
+                    <h3>Verificar Pagos</h3>
+                    <p>Revisa y valida los pagos pendientes de los usuarios activos del gimnasio.</p>
+                    <a href="../Admin/verify-payments.html" class="card-btn" id="cardVerifyPayments">Verificar Pagos</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <h3>Registrar Rutinas</h3>
+                    <p>Crea y edita rutinas de entrenamiento personalizadas para cada tipo de usuario.</p>
+                    <a href="../Admin/register-routines.html" class="card-btn" id="cardRegisterRoutines">Registrar Rutinas</a>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Ver Usuarios</h3>
+                    <p>Consulta la lista completa de usuarios, sus datos y estado de membresía.</p>
+                    <a href="../Admin/view-user.html" class="card-btn" id="cardViewUsers">Ver Usuarios</a>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-money-check-alt"></i>
+                    </div>
+                    <h3>Gestionar planes </h3>
+                    <p>Crea y transforma todos tus planes de entranmiento para tus usuarios.</p>
+                    <a href="../Admin/crearplan.html" class="card-btn" id="cardVerifyPayments">Gestionar planes</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estadísticas -->
+        <section class="stats-section">
+            <h2 class="section-title">Estadísticas del Sistema</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <i class="fas fa-users"></i>
+                    <h3 id="statUsers">0</h3>
+                    <p>Usuarios Totales</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <h3 id="statPayments">0</h3>
+                    <p>Pagos Pendientes</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-dumbbell"></i>
+                    <h3 id="statRoutines">0</h3>
+                    <p>Rutinas Activas</p>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-line"></i>
+                    <h3 id="statSatisfaction">0%</h3>
+                    <p>Satisfacción General</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Actividad Reciente -->
+        <section class="activity-section">
+            <h2 class="section-title">Actividad Reciente</h2>
+            <div class="activity-list" id="recentActivity">
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-spinner fa-spin"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Cargando actividad...</h4>
+                        <p>Espera un momento mientras cargamos la actividad reciente</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Script para el menú desplegable -->
+    <script>
+        // Elementos del DOM para el menú
+        const userBtn = document.getElementById('userBtn');
+        const userDropdown = document.getElementById('userDropdown');
+        const logoutLink = document.getElementById('logoutLink');
+        
+        // Enlaces del menú desplegable
+        const menuRegisterUser = document.getElementById('menuRegisterUser');
+        const menuVerifyPayments = document.getElementById('menuVerifyPayments');
+        const menuRegisterRoutines = document.getElementById('menuRegisterRoutines');
+        const menuViewUsers = document.getElementById('menuViewUsers');
+        
+        // Botones de las tarjetas (ahora son enlaces)
+        const cardRegisterUser = document.getElementById('cardRegisterUser');
+        const cardVerifyPayments = document.getElementById('cardVerifyPayments');
+        const cardRegisterRoutines = document.getElementById('cardRegisterRoutines');
+        const cardViewUsers = document.getElementById('cardViewUsers');
+        
+        // Toggle del menú de usuario
+        userBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+            // Rotar el ícono de la flecha
+            const chevron = userBtn.querySelector('.fa-chevron-down');
+            chevron.style.transform = userDropdown.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+        });
+        
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!userBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+                const chevron = userBtn.querySelector('.fa-chevron-down');
+                chevron.style.transform = 'rotate(0)';
+            }
+        });
+        
+        // Cerrar menú con la tecla Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && userDropdown.classList.contains('active')) {
+                userDropdown.classList.remove('active');
+                const chevron = userBtn.querySelector('.fa-chevron-down');
+                chevron.style.transform = 'rotate(0)';
+            }
+        });
+        
+        // Cerrar sesión con confirmación
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+                // Aquí iría la lógica de logout real
+                console.log('Cerrando sesión de admin...');
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // Efecto de hover en los elementos del menú
+        const menuItems = document.querySelectorAll('.menu-item');
+        menuItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateX(5px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateX(0)';
+            });
+        });
+        
+        // Actualizar fecha y hora
+        function updateDateTime() {
+            const now = new Date();
+            
+            // Formatear fecha
+            const optionsDate = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = now.toLocaleDateString('es-ES', optionsDate);
+            const dateElement = document.getElementById('currentDate');
+            if (dateElement) {
+                dateElement.textContent = formattedDate;
+            }
+            
+            // Formatear hora
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const timeElement = document.getElementById('currentTime');
+            if (timeElement) {
+                timeElement.textContent = `${hours}:${minutes}`;
+            }
+        }
+        
+        // Inicializar fecha y hora
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        
+        // Simular carga de estadísticas
+        setTimeout(() => {
+            document.getElementById('statUsers').textContent = "152";
+            document.getElementById('statPayments').textContent = "8";
+            document.getElementById('statRoutines').textContent = "45";
+            document.getElementById('statSatisfaction').textContent = "92%";
+        }, 1000);
+        
+        // Simular carga de actividad
+        setTimeout(() => {
+            const activityList = document.getElementById('recentActivity');
+            activityList.innerHTML = `
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Nuevo usuario registrado</h4>
+                        <p>Juan Pérez se ha registrado como cliente premium</p>
+                    </div>
+                    <div class="activity-time">Hace 15 minutos</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-money-check-alt"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Pago verificado</h4>
+                        <p>María García pagó su mensualidad premium</p>
+                    </div>
+                    <div class="activity-time">Hace 2 horas</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-dumbbell"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Rutina creada</h4>
+                        <p>"Fuerza Básica" para Carlos Rodríguez</p>
+                    </div>
+                    <div class="activity-time">Hace 4 horas</div>
+                </div>
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Usuario actualizado</h4>
+                        <p>Perfil de Ana López modificado</p>
+                    </div>
+                    <div class="activity-time">Ayer</div>
+                </div>
+            `;
+        }, 1500);
+        
+        // Efectos de hover para las tarjetas
+        const cards = document.querySelectorAll('.card');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const icon = this.querySelector('.card-icon');
+                icon.style.transform = 'scale(1.1)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                const icon = this.querySelector('.card-icon');
+                icon.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

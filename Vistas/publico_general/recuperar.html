@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jean Trainer - Recuperar Contraseña</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Open Sans', sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .recover-container {
+            display: flex;
+            background-color: #111;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.1);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+            min-height: 500px;
+            border: 2px solid #333;
+        }
+        
+        .logo-section {
+            flex: 1;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.05));
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            border-right: 2px solid #FFD700;
+        }
+        
+        .logo-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+        
+        .logo-section h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            z-index: 1;
+            color: #FFD700;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+        
+        .logo-section p {
+            font-size: 1rem;
+            text-align: center;
+            z-index: 1;
+            color: #ccc;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .form-section h1 {
+            color: #FFD700;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .form-section p {
+            color: #ccc;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            background-color: #000;
+            border: 2px solid #333;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+        
+        .form-group input:focus {
+            border-color: #FFD700;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
+        }
+        
+        .form-group label {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #aaa;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            background-color: #111;
+            padding: 0 5px;
+        }
+        
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            color: #FFD700;
+            font-weight: 600;
+        }
+        
+        .btn-recover {
+            background-color: #FFD700;
+            color: #000;
+            border: none;
+            border-radius: 50px;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .btn-recover:hover {
+            background-color: #FFC400;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn-recover:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #ccc;
+        }
+        
+        .login-link a {
+            color: #FFD700;
+            text-decoration: none;
+            font-weight: 700;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .lock-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            z-index: 1;
+            color: #FFD700;
+        }
+        
+        .steps {
+            margin-top: 30px;
+            z-index: 1;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: rgba(255, 215, 0, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #FFD700;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .message-display {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .error-message {
+            background: rgba(231, 76, 60, 0.1);
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        
+        .success-message {
+            background: rgba(39, 174, 96, 0.1);
+            color: #27ae60;
+            border-color: #27ae60;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-10px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .recover-container {
+                flex-direction: column;
+                max-width: 500px;
+                min-height: auto;
+            }
+            
+            .logo-section {
+                padding: 30px 20px;
+                min-height: 200px;
+                border-right: none;
+                border-bottom: 2px solid #FFD700;
+            }
+            
+            .logo-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-section {
+                padding: 30px 25px;
+            }
+            
+            .form-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .steps {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .logo-section h1 {
+                font-size: 1.6rem;
+            }
+            
+            .form-section h1 {
+                font-size: 1.6rem;
+            }
+            
+            .lock-icon {
+                font-size: 3rem;
+            }
+            
+            .form-section {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="recover-container">
+        <div class="logo-section">
+            <div class="lock-icon">
+                <i class="fas fa-key"></i>
+            </div>
+            <h1>Recuperar Contraseña</h1>
+            <p>Ingresa tu email y te enviaremos instrucciones para restablecer tu contraseña</p>
+            
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <span>Ingresa tu email</span>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <span>Recibe el enlace</span>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <span>Crea nueva contraseña</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <h1>Restablecer Contraseña</h1>
+            <p>Te enviaremos un enlace a tu correo electrónico para que puedas crear una nueva contraseña.</p>
+            
+            <!-- Contenedor para mensajes -->
+            <div id="message-container"></div>
+            
+            <form id="recoverForm">
+                <div class="form-group">
+                    <input type="email" id="email" name="email" placeholder=" " required>
+                    <label for="email">
+                        <i class="fas fa-envelope"></i> Email registrado
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn-recover" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i> Enviar Enlace de Recuperación
+                </button>
+            </form>
+            
+            <div class="login-link">
+                <p>¿Recordaste tu contraseña?</p>
+                <a href="login.html">Volver al Inicio de Sesión</a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Importar funciones desde tu cliente centralizado
+        import { resetPassword, validateEmail } from './supabaseClient.js';
+        
+        // Elementos del DOM
+        const form = document.getElementById('recoverForm');
+        const emailInput = document.getElementById('email');
+        const submitBtn = document.getElementById('submitBtn');
+        const messageContainer = document.getElementById('message-container');
+
+        // ============================================
+        // FUNCIÓN PARA MOSTRAR MENSAJES
+        // ============================================
+        function showMessage(text, type) {
+            // Limpiar mensajes anteriores
+            messageContainer.innerHTML = '';
+            
+            // Crear nuevo mensaje
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message-display ' + (type === 'error' ? 'error-message' : 'success-message');
+            messageDiv.textContent = text;
+            
+            // Agregar al contenedor
+            messageContainer.appendChild(messageDiv);
+            
+            // Auto-ocultar después de 8 segundos
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 500);
+            }, 8000);
+        }
+
+        // ============================================
+        // MANEJAR ENVÍO DEL FORMULARIO
+        // ============================================
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const originalText = submitBtn.innerHTML;
+            
+            // Validación básica
+            if (!email) {
+                showMessage('Por favor, ingresa tu email', 'error');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showMessage('Por favor, ingresa un email válido', 'error');
+                return;
+            }
+            
+            // Deshabilitar botón mientras se procesa
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+            
+            try {
+                // Usar la función resetPassword del cliente
+                const result = await resetPassword(email);
+                
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+                
+                // Éxito
+                showMessage('✅ ¡Enlace enviado! Revisa tu correo (y la carpeta de spam)', 'success');
+                
+                // Limpiar campo
+                emailInput.value = '';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Manejar errores específicos
+                if (error.message.includes('Email not found') || error.message.includes('User not found')) {
+                    showMessage('❌ No encontramos una cuenta con ese email', 'error');
+                } else if (error.message.includes('rate limit')) {
+                    showMessage('⏰ Demasiados intentos. Espera unos minutos antes de intentar nuevamente', 'error');
+                } else if (error.message.includes('Invalid email')) {
+                    showMessage('❌ Email inválido', 'error');
+                } else {
+                    showMessage('❌ Error al enviar: ' + error.message, 'error');
+                }
+            } finally {
+                // Restaurar botón
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
+            }
+        });
+
+        // ============================================
+        // ANIMACIÓN PARA LOS LABELS FLOTANTES
+        // ============================================
+        document.querySelectorAll('.form-group input').forEach(input => {
+            // Mantener label arriba si hay valor al cargar
+            if (input.value) {
+                updateLabelPosition(input);
+            }
+            
+            input.addEventListener('focus', function() {
+                updateLabelPosition(this);
+            });
+            
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    resetLabelPosition(this);
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.value) {
+                    updateLabelPosition(this);
+                } else {
+                    resetLabelPosition(this);
+                }
+            });
+        });
+        
+        function updateLabelPosition(input) {
+            const label = input.previousElementSibling;
+            label.style.top = '-10px';
+            label.style.left = '10px';
+            label.style.fontSize = '12px';
+            label.style.color = '#FFD700';
+            label.style.fontWeight = '600';
+        }
+        
+        function resetLabelPosition(input) {
+            const label = input.previousElementSibling;
+            label.style.top = '15px';
+            label.style.left = '15px';
+            label.style.fontSize = '16px';
+            label.style.color = '#aaa';
+            label.style.fontWeight = 'normal';
+        }
+    </script>
+</body>
+</html>
