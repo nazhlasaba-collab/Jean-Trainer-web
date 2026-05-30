@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Jean Trainer - Iniciar Sesión</title>
     <style>
-        /* MISMO CSS QUE TIENES */
         * {
             margin: 0;
             padding: 0;
@@ -80,14 +79,11 @@
             line-height: 1.6;
         }
         
-        .logo-image {
-            width: 100%;
-            max-width: 350px;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        .trainer-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
             z-index: 1;
-            border: 2px solid #FFD700;
+            color: #FFD700;
         }
         
         .form-section {
@@ -202,33 +198,6 @@
             text-decoration: underline;
         }
         
-        .error-message {
-            background: rgba(231, 76, 60, 0.1);
-            color: #e74c3c;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            border-left: 4px solid #e74c3c;
-        }
-        
-        .success-message {
-            background: rgba(39, 174, 96, 0.1);
-            color: #27ae60;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: center;
-            border-left: 4px solid #27ae60;
-        }
-        
-        .trainer-icon {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            z-index: 1;
-            color: #FFD700;
-        }
-        
         .remember-me {
             display: flex;
             align-items: center;
@@ -243,54 +212,6 @@
         .remember-me label {
             color: #ccc;
             cursor: pointer;
-        }
-        
-        @media (max-width: 768px) {
-            .login-container {
-                flex-direction: column;
-                max-width: 500px;
-            }
-            
-            .logo-section {
-                padding: 30px 20px;
-                min-height: 250px;
-                border-right: none;
-                border-bottom: 2px solid #FFD700;
-            }
-            
-            .logo-section h1 {
-                font-size: 2rem;
-            }
-            
-            .logo-section h2 {
-                font-size: 1.1rem;
-            }
-            
-            .form-section {
-                padding: 40px 30px;
-            }
-            
-            .logo-image {
-                max-width: 250px;
-            }
-        }
-        
-        @media (max-width: 576px) {
-            body {
-                padding: 10px;
-            }
-            
-            .logo-section h1 {
-                font-size: 1.8rem;
-            }
-            
-            .form-section h1 {
-                font-size: 1.8rem;
-            }
-            
-            .trainer-icon {
-                font-size: 3rem;
-            }
         }
         
         .message-display {
@@ -324,6 +245,50 @@
                 opacity: 1;
             }
         }
+        
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                max-width: 500px;
+            }
+            
+            .logo-section {
+                padding: 30px 20px;
+                min-height: 250px;
+                border-right: none;
+                border-bottom: 2px solid #FFD700;
+            }
+            
+            .logo-section h1 {
+                font-size: 2rem;
+            }
+            
+            .logo-section h2 {
+                font-size: 1.1rem;
+            }
+            
+            .form-section {
+                padding: 40px 30px;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            body {
+                padding: 10px;
+            }
+            
+            .logo-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .form-section h1 {
+                font-size: 1.8rem;
+            }
+            
+            .trainer-icon {
+                font-size: 3rem;
+            }
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -336,7 +301,6 @@
             </div>
             <h1>Jean Trainer</h1>
             <h2>Sistema de Gestión de Entrenamiento</h2>
-            <img src="https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Entrenamiento personal" class="logo-image">
         </div>
         
         <div class="form-section">
@@ -448,16 +412,12 @@
                 console.log('✅ Login exitoso - Usuario:', userName, 'Rol:', userRol);
                 showMessage(`¡Bienvenido, ${userName}!`, 'success');
                 
-                // REDIRECCIÓN SEGÚN EL ROL
                 setTimeout(() => {
                     if (userRol === 'admin') {
-                        console.log('🚀 Redirigiendo a dashboard_admin.html');
                         window.location.href = 'dashboard_admin.html';
                     } else if (userRol === 'entrenador') {
-                        console.log('🚀 Redirigiendo a dashboard_entrenador.html');
                         window.location.href = 'dashboard_entrenador.html';
                     } else if (userRol === 'usuario'){
-                        console.log('🚀 Redirigiendo a dashboard.html');
                         window.location.href = 'dashboard.html';
                     }
                 }, 1500);
