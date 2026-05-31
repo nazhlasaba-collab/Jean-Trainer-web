@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagar Membresía - Athlex</title>
+    <title>Pagar Membresía - Jean Trainer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -379,8 +379,8 @@
 <body>
     <header>
         <div class="navbar">
-            <div class="logo"><a href="dashboard.html">Jean Trainer</a></div>
-            <button class="back-btn" onclick="window.location.href='dashboard.html'">
+            <div class="logo"><a href="dashboard-crossfit.html">Jean Trainer</a></div>
+            <button class="back-btn" onclick="window.location.href='dashboard-crossfit.html'">
                 <i class="fas fa-arrow-left"></i> Regresar
             </button>
         </div>
@@ -478,14 +478,13 @@
             
             <div id="pago_movil_fields" class="dynamic-fields">
                 <div class="form-group"><label><i class="fas fa-phone"></i> Teléfono del emisor</label><input type="tel" id="telefono_emisor" placeholder="0414-1234567"></div>
-                <div class="form-group"><label><i class="fas fa-university"></i> Banco del emisor</label><select id="banco_emisor"><option value="">Selecciona tu banco</option><option value="Banesco">Banesco</option><option value="Mercantil">Mercantil</option><option value="Provincial">Provincial</option><option value="Banco de Venezuela">Banco de Venezuela</option><option value="Bicentenario">Bicentenario</option></select></div>
+                <div class="form-group"><label><i class="fas fa-university"></i> Banco del emisor</label><select id="banco_emisor"><option value="">Selecciona tu banco</option><option value="banesco">Banesco</option><option value="mercantil">Mercantil</option><option value="provincial">Provincial</option><option value="venezuela">Banco de Venezuela</option><option value="bicentenario">Bicentenario</option></select></div>
                 <div class="form-group"><label><i class="fas fa-id-card"></i> Cédula del emisor</label><input type="text" id="cedula_emisor" placeholder="V-12345678"></div>
-                <div class="form-group"><label><i class="fas fa-hashtag"></i> Número de referencia</label><input type="text" id="numero_referencia_pm" placeholder="Ej: 1234567890"></div>
             </div>
             
             <div id="transferencia_fields" class="dynamic-fields">
                 <div class="form-group"><label><i class="fas fa-hashtag"></i> Número de referencia</label><input type="text" id="numero_referencia" placeholder="Ej: 1234567890"></div>
-                <div class="form-group"><label><i class="fas fa-university"></i> Banco desde donde transfieres</label><select id="banco_emisor_transferencia"><option value="">Selecciona tu banco</option><option value="Banesco">Banesco</option><option value="Mercantil">Mercantil</option><option value="Provincial">Provincial</option><option value="Banco de Venezuela">Banco de Venezuela</option><option value="Bicentenario">Bicentenario</option></select></div>
+                <div class="form-group"><label><i class="fas fa-university"></i> Banco desde donde transfieres</label><select id="banco_emisor_transferencia"><option value="">Selecciona tu banco</option><option value="banesco">Banesco</option><option value="mercantil">Mercantil</option><option value="provincial">Provincial</option><option value="venezuela">Banco de Venezuela</option><option value="bicentenario">Bicentenario</option></select></div>
             </div>
             
             <div id="efectivo_fields" class="dynamic-fields">
@@ -508,7 +507,7 @@
     </div>
 
     <script type="module">
-        import { supabase } from './supabaseClient.js';
+        import { supabase } from '../publico_general/supabaseClient.js';
         
         const bankAccounts = {
             pago_movil: { title: "📱 Datos para Pago Móvil", accounts: [{ bank: "Banesco", phone: "0412-1234567", cedula: "V-12345678", beneficiary: "Jean Trainer" }] },
@@ -532,9 +531,10 @@
         
         async function obtenerPlanUsuario() {
             try {
+                // CORREGIDO: Obtener plan_nombre en lugar de tipo
                 const { data: membership, error: memError } = await supabase
                     .from('membresias')
-                    .select('*')
+                    .select('*, plan_nombre')
                     .eq('id_usuario', currentUser.id)
                     .order('created_at', { ascending: false })
                     .limit(1)
@@ -544,7 +544,7 @@
                 userMembership = membership;
                 
                 if (membership && membership.plan_nombre) {
-                    // CORREGIDO: Buscar por NOMBRE en lugar de tipo
+                    // CORREGIDO: Buscar por nombre en lugar de tipo
                     const { data: plan, error: planError } = await supabase
                         .from('catalogo_planes')
                         .select('*')
@@ -560,11 +560,16 @@
                         precioMensual = plan.precio;
                         document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> ${plan.nombre}`;
                     } else {
-                        // Si no encuentra el plan, usar precio por defecto
+                        // Si no encuentra el plan en catálogo, usa el nombre guardado
                         precioMensual = 45;
-                        document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> ${membership.plan_nombre || 'Plan Activo'}`;
+                        document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> ${membership.plan_nombre}`;
                     }
+                } else if (membership) {
+                    // Si tiene membresía pero no plan_nombre (por si acaso)
+                    precioMensual = 45;
+                    document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> Plan Activo`;
                 } else {
+                    // Sin membresía activa
                     precioMensual = 45;
                     document.getElementById('planName').innerHTML = '<i class="fas fa-info-circle"></i> Sin plan activo';
                 }
@@ -650,7 +655,7 @@
             try {
                 const { data: { user }, error } = await supabase.auth.getUser();
                 if (error || !user) {
-                    window.location.href = 'login.html';
+                    window.location.href = '../publico_general/login.html';
                     return;
                 }
                 currentUser = user;
@@ -663,7 +668,7 @@
                 const diasRestantesEl = document.getElementById('diasRestantes');
                 
                 if (membership) {
-                    fechaInicioEl.textContent = new Date(membership.fecha_inscrito).toLocaleDateString('es-ES');
+                    fechaInicioEl.textContent = membership.fecha_inscrito ? new Date(membership.fecha_inscrito).toLocaleDateString('es-ES') : '-';
                     
                     const expiryDate = membership.fecha_expiracion || membership.fecha_siguiente_pago;
                     if (expiryDate) {
@@ -691,7 +696,7 @@
                         diasRestantesEl.textContent = 'Ilimitado?';
                     }
                 } else {
-                    document.getElementById('planName').innerHTML = '<i class="fas fa-info-circle"></i> Sin plan activo';
+                    // Sin membresía - ya se actualizó el nombre en obtenerPlanUsuario
                     fechaInicioEl.textContent = '-';
                     fechaExpiracionEl.textContent = '-';
                     planStatusEl.textContent = '📝 SIN PLAN';
@@ -755,7 +760,7 @@
             
             if (!currentUser) {
                 alert('Debes iniciar sesión');
-                window.location.href = 'login.html';
+                window.location.href = '../publico_general/login.html';
                 return;
             }
             
@@ -768,84 +773,54 @@
             const tipo = document.getElementById('tipo_pago').value;
             const periodo = selectedMeses * 30;
             
-            // CORREGIDO: Asegurar que se guarda el plan_nombre
-            const planNombreActual = userMembership?.plan_nombre || userPlan?.nombre || 'Crossfit Standard';
-            
-            let paymentData = {
-                id_usuario: currentUser.id,
-                monto: monto,
-                periodo_dias: periodo,
-                metodo_pago: selectedMethod,
-                tipo_pago: tipo,
-                estado: 'pendiente',
-                plan_nombre: planNombreActual,
-                fecha_pago: new Date().toISOString().split('T')[0]
+            let params = {
+                p_id_usuario: currentUser.id,
+                p_monto: monto,
+                p_metodo_pago: selectedMethod,
+                p_tipo_pago: tipo,
+                p_periodo_dias: periodo
             };
             
             if (selectedMethod === 'pago_movil') {
                 const telefono = document.getElementById('telefono_emisor')?.value;
                 const banco = document.getElementById('banco_emisor')?.value;
                 const cedula = document.getElementById('cedula_emisor')?.value;
-                const referencia = document.getElementById('numero_referencia_pm')?.value;
-                
-                if (!telefono || !banco || !cedula || !referencia) { 
-                    alert('Completa todos los datos del Pago Móvil: teléfono, banco, cédula y referencia'); 
-                    return; 
-                }
-                
-                paymentData.telefono_emisor = telefono;
-                paymentData.banco_emisor = banco;
-                paymentData.cedula_emisor = cedula;
-                paymentData.numero_referencia = referencia;
-                
+                if (!telefono || !banco || !cedula) { alert('Completa todos los datos del Pago Móvil'); return; }
+                params.p_telefono_emisor = telefono;
+                params.p_banco_emisor = banco;
+                params.p_cedula_emisor = cedula;
             } else if (selectedMethod === 'transferencia') {
                 const referencia = document.getElementById('numero_referencia')?.value;
                 const banco = document.getElementById('banco_emisor_transferencia')?.value;
-                
-                if (!referencia || !banco) { 
-                    alert('Completa la referencia y el banco'); 
-                    return; 
-                }
-                
-                paymentData.numero_referencia = referencia;
-                paymentData.banco_emisor = banco;
-                
+                if (!referencia || !banco) { alert('Completa la referencia y el banco'); return; }
+                params.p_numero_referencia = referencia;
+                params.p_banco_emisor = banco;
             } else if (selectedMethod === 'efectivo') {
                 const recibo = document.getElementById('recibo_numero')?.value;
-                if (!recibo) { 
-                    alert('Ingresa el número de recibo'); 
-                    return; 
-                }
-                paymentData.recibo_numero = recibo;
-                
+                if (!recibo) { alert('Ingresa el número de recibo'); return; }
+                params.p_recibo_numero = recibo;
             } else if (selectedMethod === 'tarjeta') {
                 const aprobacion = document.getElementById('aprobacion_numero')?.value;
-                if (!aprobacion) { 
-                    alert('Ingresa el número de aprobación'); 
-                    return; 
-                }
-                paymentData.aprobacion_numero = aprobacion;
+                if (!aprobacion) { alert('Ingresa el número de aprobación'); return; }
+                params.p_aprobacion_numero = aprobacion;
             }
             
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando pago...';
             
             try {
-                console.log('Registrando pago:', paymentData);
-                
-                const { error } = await supabase
-                    .from('pagos')
-                    .insert([paymentData]);
-                
+                const { data, error } = await supabase.rpc('crear_pago', params);
                 if (error) throw error;
                 
-                let metodoNombre = { pago_movil:'Pago Móvil', transferencia:'Transferencia', efectivo:'Efectivo', tarjeta:'Tarjeta' }[selectedMethod];
-                alert(`✅ ¡Pago registrado exitosamente!\n\n📅 Meses adelantados: ${selectedMeses} mes(es) (${periodo} días)\n💰 Monto: $${monto}\n📱 Método: ${metodoNombre}\n⏳ Estado: Pendiente de verificación\n\nEl administrador verificará tu pago y extenderá tu membresía pronto.`);
-                window.location.href = 'dashboard.html';
-                
+                if (data?.success) {
+                    let metodoNombre = { pago_movil:'Pago Móvil', transferencia:'Transferencia', efectivo:'Efectivo', tarjeta:'Tarjeta' }[selectedMethod];
+                    alert(`✅ ¡Pago registrado exitosamente!\n\n📅 Meses adelantados: ${selectedMeses} mes(es) (${periodo} días)\n💰 Monto: $${monto}\n📱 Método: ${metodoNombre}\n⏳ Estado: Pendiente de verificación\n\nEl administrador verificará tu pago y extenderá tu membresía pronto.`);
+                    window.location.href = 'dashboard-crossfit.html';
+                } else {
+                    throw new Error(data?.error || 'Error al registrar pago');
+                }
             } catch (error) {
-                console.error('Error completo:', error);
-                alert('❌ Error al registrar pago: ' + error.message);
+                alert('❌ Error: ' + error.message);
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-check-circle"></i> Registrar Pago y Extender Membresía';
             }
