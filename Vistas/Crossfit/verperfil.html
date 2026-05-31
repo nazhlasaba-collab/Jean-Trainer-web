@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <title>Mi Perfil - Athlex</title>
+    <title>Mi Perfil - Jean Trainer</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Open Sans', sans-serif; }
         body { background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%); color: #fff; line-height: 1.6; min-height: 100vh; }
@@ -51,6 +51,8 @@
         .status-badge { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
         .status-activo { background: rgba(39,174,96,0.2); color: #27ae60; }
         .status-inactivo { background: rgba(231,76,60,0.2); color: #e74c3c; }
+        .status-vencida { background: rgba(244,67,54,0.2); color: #f44336; }
+        .status-proximo { background: rgba(255,170,0,0.2); color: #ffaa00; }
         .action-buttons { display: flex; gap: 15px; justify-content: flex-end; margin-top: 20px; grid-column: span 2; }
         .btn { padding: 10px 25px; border-radius: 50px; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; border: none; display: flex; align-items: center; gap: 8px; }
         .btn-primary { background: #FFD700; color: #000; }
@@ -79,7 +81,7 @@
 <body>
     <header>
         <div class="navbar">
-            <div class="logo"><a href="dashboard-crossfit.html"><i class="fas fa-dumbbell"></i> Athlex</a></div>
+            <div class="logo"><a href="dashboard-crossfit.html"><i class="fas fa-dumbbell"></i> Jean Trainer</a></div>
             <button class="back-btn" onclick="window.location.href='dashboard-crossfit.html'"><i class="fas fa-arrow-left"></i> Volver</button>
         </div>
     </header>
@@ -166,11 +168,11 @@
                             <div class="membership-card" id="membershipContainer">
                                 <div class="membership-header"><i class="fas fa-crown"></i><h3>Mi Membresía</h3></div>
                                 <div class="membership-details">
-                                    <div class="membership-item"><span class="label">Plan Actual</span><span class="value" id="membresiaTipo">-</span></div>
+                                    <div class="membership-item"><span class="label">Plan Actual</span><span class="value" id="membresiaPlan">-</span></div>
                                     <div class="membership-item"><span class="label">Estado</span><span class="value" id="membresiaEstado">-</span></div>
                                     <div class="membership-item"><span class="label">Fecha Inscripción</span><span class="value" id="membresiaInscripcion">-</span></div>
-                                    <div class="membership-item"><span class="label">Próximo Pago</span><span class="value" id="membresiaProximoPago">-</span></div>
                                     <div class="membership-item"><span class="label">Fecha Expiración</span><span class="value" id="membresiaExpiracion">-</span></div>
+                                    <div class="membership-item"><span class="label">Días Restantes</span><span class="value" id="membresiaDiasRestantes">-</span></div>
                                 </div>
                             </div>
 
@@ -191,16 +193,21 @@
         let isEditing = false;
         let currentUserId = null;
         let userProfile = null;
+        let currentMembership = null;
 
         document.addEventListener('DOMContentLoaded', async function() {
             try {
                 const { data: { user }, error: authError } = await supabase.auth.getUser();
-                if (authError || !user) { window.location.href = 'login.html'; return; }
+                if (authError || !user) { 
+                    window.location.href = 'login.html'; 
+                    return; 
+                }
                 
                 currentUserId = user.id;
                 console.log('Usuario autenticado:', currentUserId);
                 
                 await loadUserProfile();
+                await loadUserMembership();
                 
                 document.getElementById('loadingSpinner').style.display = 'none';
                 document.getElementById('profileContainer').style.display = 'block';
@@ -213,7 +220,6 @@
 
         async function loadUserProfile() {
             try {
-                // Cargar datos del usuario
                 const { data: profile, error } = await supabase
                     .from('usuarios')
                     .select('*')
@@ -226,7 +232,6 @@
                 console.log('Perfil cargado:', profile);
 
                 populateForm(profile);
-                await loadUserMembership();
 
             } catch (error) {
                 console.error('Error cargando perfil:', error);
@@ -238,7 +243,7 @@
             try {
                 console.log('Cargando membresía para usuario:', currentUserId);
                 
-                // Consulta directa a la tabla membresias
+                // CORREGIDO: Usar plan_nombre en lugar de tipo
                 const { data: membership, error } = await supabase
                     .from('membresias')
                     .select('*')
@@ -254,58 +259,87 @@
                 }
                 
                 const membresia = membership && membership.length > 0 ? membership[0] : null;
+                currentMembership = membresia;
                 
                 if (membresia) {
                     console.log('Membresía encontrada:', membresia);
                     
-                    // Traducir tipo de plan
-                    let planDisplay = 'Crossfit Standard';
-                    const tipo = membresia.tipo || '';
+                    // CORREGIDO: Mostrar plan_nombre directamente
+                    const planNombre = membresia.plan_nombre || 'Plan Activo';
+                    document.getElementById('membresiaPlan').textContent = planNombre;
                     
-                    if (tipo === 'running_standard') planDisplay = 'Running Standard';
-                    else if (tipo === 'hyrox_standard') planDisplay = 'Hyrox Standard';
-                    else if (tipo === 'personalizado') planDisplay = 'Personalizado';
-                    else if (tipo === 'premium') planDisplay = 'Premium';
-                    else if (tipo.includes('combo')) planDisplay = 'Combo Especial';
-                    else if (tipo === 'crossfit_standard') planDisplay = 'Crossfit Standard';
-                    else if (tipo === 'crossfit_personalizado') planDisplay = 'Crossfit Personalizado';
-                    else if (tipo === 'running_personalizado') planDisplay = 'Running Personalizado';
-                    else if (tipo === 'hyrox_personalizado') planDisplay = 'Hyrox Personalizado';
-                    else if (tipo === 'crossfit_running_combo') planDisplay = 'Crossfit + Running Combo';
-                    else if (tipo === 'running_hyrox_combo') planDisplay = 'Running + Hyrox Combo';
-                    else if (tipo === 'hyrox_crossfit_combo') planDisplay = 'Hyrox + Crossfit Combo';
-                    else if (tipo === 'triple_combo') planDisplay = 'Triple Combo';
-                    
-                    document.getElementById('membresiaTipo').textContent = planDisplay;
-                    
+                    // CORREGIDO: Determinar estado basado en fecha_expiracion
                     const estado = membresia.estado || 'inactivo';
+                    const fechaExpiracion = membresia.fecha_expiracion;
+                    const hoy = new Date();
+                    hoy.setHours(0, 0, 0, 0);
+                    
+                    let estadoTexto = '';
+                    let estadoClass = '';
+                    
+                    if (estado === 'activo' && fechaExpiracion) {
+                        const expDate = new Date(fechaExpiracion);
+                        expDate.setHours(0, 0, 0, 0);
+                        const diasRestantes = Math.ceil((expDate - hoy) / (1000 * 60 * 60 * 24));
+                        
+                        if (expDate < hoy) {
+                            estadoTexto = 'VENCIDA';
+                            estadoClass = 'status-vencida';
+                        } else if (diasRestantes <= 7) {
+                            estadoTexto = 'PRÓXIMO A VENCER';
+                            estadoClass = 'status-proximo';
+                        } else {
+                            estadoTexto = 'ACTIVA';
+                            estadoClass = 'status-activo';
+                        }
+                    } else if (estado === 'suspendido') {
+                        estadoTexto = 'SUSPENDIDA';
+                        estadoClass = 'status-inactivo';
+                    } else {
+                        estadoTexto = 'INACTIVA';
+                        estadoClass = 'status-inactivo';
+                    }
+                    
                     const estadoElement = document.getElementById('membresiaEstado');
-                    estadoElement.textContent = estado === 'activo' ? 'Activo' : estado === 'suspendido' ? 'Suspendido' : 'Inactivo';
-                    estadoElement.className = 'value status-badge ' + (estado === 'activo' ? 'status-activo' : 'status-inactivo');
+                    estadoElement.textContent = estadoTexto;
+                    estadoElement.className = `value status-badge ${estadoClass}`;
 
                     if (membresia.fecha_inscrito) {
                         document.getElementById('membresiaInscripcion').textContent = new Date(membresia.fecha_inscrito).toLocaleDateString('es-ES');
                     }
 
-                    const fechaPago = membresia.fecha_expiracion || membresia.fecha_siguiente_pago;
-                    if (fechaPago) {
-                        document.getElementById('membresiaProximoPago').textContent = new Date(fechaPago).toLocaleDateString('es-ES');
-                        document.getElementById('membresiaExpiracion').textContent = new Date(fechaPago).toLocaleDateString('es-ES');
+                    if (fechaExpiracion) {
+                        const expDate = new Date(fechaExpiracion);
+                        document.getElementById('membresiaExpiracion').textContent = expDate.toLocaleDateString('es-ES');
+                        
+                        // Calcular días restantes
+                        const diasRestantes = Math.ceil((expDate - hoy) / (1000 * 60 * 60 * 24));
+                        let diasTexto = '';
+                        if (diasRestantes < 0) {
+                            diasTexto = 'Vencida';
+                        } else if (diasRestantes === 0) {
+                            diasTexto = 'Vence hoy';
+                        } else {
+                            diasTexto = `${diasRestantes} días`;
+                        }
+                        document.getElementById('membresiaDiasRestantes').innerHTML = diasTexto;
                     } else {
                         document.getElementById('membresiaExpiracion').textContent = 'No definida';
+                        document.getElementById('membresiaDiasRestantes').textContent = 'Sin fecha';
                     }
                 } else {
                     console.log('No se encontró membresía para el usuario');
-                    document.getElementById('membresiaTipo').textContent = 'Sin plan activo';
-                    document.getElementById('membresiaEstado').textContent = 'Inactivo';
+                    document.getElementById('membresiaPlan').textContent = 'Sin plan activo';
+                    document.getElementById('membresiaEstado').textContent = 'INACTIVA';
                     document.getElementById('membresiaEstado').className = 'value status-badge status-inactivo';
                     document.getElementById('membresiaInscripcion').textContent = '-';
-                    document.getElementById('membresiaProximoPago').textContent = '-';
                     document.getElementById('membresiaExpiracion').textContent = '-';
+                    document.getElementById('membresiaDiasRestantes').textContent = '-';
                 }
             } catch (error) {
                 console.error('Error cargando membresía:', error);
-                document.getElementById('membresiaTipo').textContent = 'Error al cargar';
+                document.getElementById('membresiaPlan').textContent = 'Error al cargar';
+                document.getElementById('membresiaEstado').textContent = 'ERROR';
             }
         }
 
