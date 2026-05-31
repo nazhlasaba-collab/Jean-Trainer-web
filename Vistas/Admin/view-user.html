@@ -969,7 +969,7 @@
             }
         });
         
-        // Cargar datos completos (CORREGIDO - usa plan_nombre)
+        // Cargar datos completos
         window.cargarDatosCompletos = async function() {
             try {
                 window.mostrarNotificacion('🔄 Cargando usuarios...', 'info');
@@ -990,7 +990,7 @@
                     window.allUsers = users || [];
                 }
                 
-                // Cargar membresías (NORMALIZANDO plan_nombre)
+                // Cargar membresías
                 const { data: memberships, error: membershipsError } = await supabase
                     .rpc('obtener_todas_membresias');
                 
@@ -1029,7 +1029,7 @@
             document.getElementById('activeMemberships').textContent = window.allMemberships.filter(m => m.estado === 'activo').length;
         };
         
-        // Mostrar usuarios en tabla (CORREGIDO - usa plan_nombre)
+        // Mostrar usuarios en tabla
         window.mostrarUsuarios = function(usuarios) {
             const container = document.getElementById('usersContainer');
             
@@ -1219,7 +1219,7 @@
             await window.cargarDatosCompletos();
         };
         
-        // VER USUARIO - Modal con detalles (CORREGIDO - usa plan_nombre)
+        // VER USUARIO - Modal con detalles
         window.verUsuario = async function(userId) {
             try {
                 const user = window.allUsers.find(u => u.id_usuario === userId);
@@ -1348,26 +1348,32 @@
             window.location.href = `edit-user.html?id=${userId}`;
         };
         
-        // ELIMINAR USUARIO (desde la tabla)
+        // ============================================
+        // ELIMINAR USUARIO usando la función de PostgreSQL
+        // ============================================
         window.eliminarUsuario = async function(userId, nombreCompleto) {
-            const confirmar = confirm(`¿Estás seguro de eliminar al usuario "${nombreCompleto}"?\n\nEsta acción eliminará también:\n- Su membresía\n- Sus pagos\n- Sus rutinas creadas\n\nEsta acción NO se puede deshacer.`);
+            const confirmar = confirm(`¿Estás seguro de eliminar al usuario "${nombreCompleto}"?\n\nEsta acción eliminará TODOS los registros relacionados:\n- Historial de pagos\n- Pagos\n- Membresía\n- Rutinas creadas\n\n⚠️ Esta acción NO se puede deshacer.`);
             if (!confirmar) return;
             
             try {
-                window.mostrarNotificacion('🔄 Eliminando usuario...', 'info');
+                window.mostrarNotificacion('🔄 Eliminando usuario y todos sus registros...', 'info');
                 
-                await supabase.from('pagos').delete().eq('id_usuario', userId);
-                await supabase.from('membresias').delete().eq('id_usuario', userId);
-                await supabase.from('rutinas').delete().eq('creado_por', userId);
+                // Llamar a la función de PostgreSQL
+                const { data, error } = await supabase
+                    .rpc('eliminar_usuario_completo', { p_usuario_id: userId });
                 
-                const { error } = await supabase.from('usuarios').delete().eq('id_usuario', userId);
                 if (error) throw error;
                 
-                window.mostrarNotificacion('✅ Usuario eliminado correctamente', 'success');
-                await window.cargarDatosCompletos();
+                if (data?.success) {
+                    window.mostrarNotificacion(data.message, 'success');
+                    await window.cargarDatosCompletos();
+                    window.cerrarModal();
+                } else {
+                    throw new Error(data?.error || 'Error al eliminar');
+                }
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Error al eliminar:', error);
                 window.mostrarNotificacion('❌ Error al eliminar usuario: ' + error.message, 'error');
             }
         };
@@ -1376,23 +1382,27 @@
         window.eliminarUsuarioDesdeModal = async function(userId, nombreCompleto) {
             window.cerrarModal();
             
-            const confirmar = confirm(`¿Estás seguro de eliminar al usuario "${nombreCompleto}"?\n\nEsta acción eliminará también:\n- Su membresía\n- Sus pagos\n- Sus rutinas creadas\n\nEsta acción NO se puede deshacer.`);
+            const confirmar = confirm(`¿Estás seguro de eliminar al usuario "${nombreCompleto}"?\n\nEsta acción eliminará TODOS los registros relacionados:\n- Historial de pagos\n- Pagos\n- Membresía\n- Rutinas creadas\n\n⚠️ Esta acción NO se puede deshacer.`);
             if (!confirmar) return;
             
             try {
-                window.mostrarNotificacion('🔄 Eliminando usuario...', 'info');
+                window.mostrarNotificacion('🔄 Eliminando usuario y todos sus registros...', 'info');
                 
-                await supabase.from('pagos').delete().eq('id_usuario', userId);
-                await supabase.from('membresias').delete().eq('id_usuario', userId);
-                await supabase.from('rutinas').delete().eq('creado_por', userId);
+                // Llamar a la función de PostgreSQL
+                const { data, error } = await supabase
+                    .rpc('eliminar_usuario_completo', { p_usuario_id: userId });
                 
-                const { error } = await supabase.from('usuarios').delete().eq('id_usuario', userId);
                 if (error) throw error;
                 
-                window.mostrarNotificacion('✅ Usuario eliminado correctamente', 'success');
-                await window.cargarDatosCompletos();
+                if (data?.success) {
+                    window.mostrarNotificacion(data.message, 'success');
+                    await window.cargarDatosCompletos();
+                } else {
+                    throw new Error(data?.error || 'Error al eliminar');
+                }
                 
             } catch (error) {
+                console.error('Error al eliminar:', error);
                 window.mostrarNotificacion('❌ Error al eliminar usuario: ' + error.message, 'error');
             }
         };
