@@ -169,6 +169,16 @@
             font-weight: 700;
         }
 
+        .crossfit-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background-color: rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            color: #FFD700;
+            font-weight: 600;
+            margin: 10px;
+        }
+
         .cards-section {
             margin-bottom: 60px;
         }
@@ -352,15 +362,23 @@
     </header>
 
     <main class="dashboard-content">
-        <div id="loadingState" class="loading" style="display: none;">
+        <div id="loadingState" class="loading">
             <div class="loading-spinner"><i class="fas fa-spinner"></i></div>
             <p>Cargando tu información...</p>
         </div>
 
-        <div id="dashboardContent">
+        <div id="dashboardContent" style="display: none;">
             <section class="crossfit-hero">
                 <h1>¡HOLA, <span class="user-name" id="userName">Atleta</span>!</h1>
                 <p>Bienvenido a tu zona de entrenamiento. Gestiona tu perfil, rutinas, récords y pagos desde aquí.</p>
+                <div>
+                    <span class="crossfit-badge" id="membershipBadge">
+                        <i class="fas fa-dumbbell"></i> Crossfit
+                    </span>
+                    <span class="crossfit-badge" id="statusBadge">
+                        <i class="fas fa-spinner"></i> Verificando...
+                    </span>
+                </div>
             </section>
 
             <section class="cards-section">
@@ -427,7 +445,7 @@
         let currentUser = null;
         let membresiaActiva = false;
         let fechaExpiracion = null;
-        let planNombre = null;
+        let planNombre = null;  // CAMBIADO: antes era tipoMembresia, ahora es planNombre
 
         async function verificarMembresia() {
             try {
@@ -435,6 +453,7 @@
                 if (error || !user) return false;
                 currentUser = user;
                 
+                // CORREGIDO: usar plan_nombre en lugar de tipo
                 const { data: membresia, error: memError } = await supabase
                     .from('membresias')
                     .select('estado, fecha_expiracion, plan_nombre')
@@ -447,6 +466,7 @@
                     membresiaActiva = false;
                     planNombre = null;
                     fechaExpiracion = null;
+                    console.log('No se encontró membresía');
                     return false;
                 }
                 
@@ -461,6 +481,7 @@
                     
                     if (expiracion >= hoy) {
                         membresiaActiva = true;
+                        console.log('Membresía activa:', planNombre);
                         return true;
                     } else {
                         membresiaActiva = false;
@@ -533,20 +554,44 @@
         }
 
         async function actualizarUI() {
+            const statusBadge = document.getElementById('statusBadge');
             const deudaAlert = document.getElementById('deudaAlert');
+            const membershipBadge = document.getElementById('membershipBadge');
             
             await verificarMembresia();
             
-            if (deudaAlert) {
-                if (membresiaActiva) {
-                    deudaAlert.style.display = 'none';
+            // Mostrar el nombre del plan
+            if (planNombre) {
+                membershipBadge.innerHTML = `<i class="fas fa-dumbbell"></i> ${planNombre}`;
+            } else {
+                membershipBadge.innerHTML = `<i class="fas fa-dumbbell"></i> Sin membresía`;
+            }
+            
+            if (membresiaActiva && fechaExpiracion) {
+                const expiracion = new Date(fechaExpiracion);
+                const hoy = new Date();
+                const diasRestantes = Math.ceil((expiracion - hoy) / (1000 * 60 * 60 * 24));
+                
+                if (diasRestantes <= 7) {
+                    statusBadge.innerHTML = `<i class="fas fa-clock"></i> Por vencer (${diasRestantes} días)`;
+                    statusBadge.style.backgroundColor = 'rgba(255, 193, 7, 0.2)';
+                    statusBadge.style.color = '#FFC107';
                 } else {
-                    deudaAlert.style.display = 'flex';
+                    statusBadge.innerHTML = `<i class="fas fa-check-circle"></i> Membresía Activa`;
+                    statusBadge.style.backgroundColor = 'rgba(76, 175, 80, 0.2)';
+                    statusBadge.style.color = '#4CAF50';
                 }
+                if (deudaAlert) deudaAlert.style.display = 'none';
+            } else {
+                statusBadge.innerHTML = `<i class="fas fa-exclamation-circle"></i> Membresía Suspendida`;
+                statusBadge.style.backgroundColor = 'rgba(244, 67, 54, 0.2)';
+                statusBadge.style.color = '#F44336';
+                if (deudaAlert) deudaAlert.style.display = 'flex';
             }
         }
 
         function setupEventListeners() {
+            // CORREGIDO: Redirige a ver-rutina.html directamente
             const handleRutinasClick = async (e) => {
                 e.preventDefault();
                 await verificarMembresia();
@@ -558,12 +603,15 @@
                 }
             };
             
+            // Botón de la tarjeta "Mis Rutinas"
             const btnRutinas = document.getElementById('cardMyRoutines');
             if (btnRutinas) btnRutinas.addEventListener('click', handleRutinasClick);
             
+            // Opción del menú desplegable "Mis Rutinas"
             const menuRutinas = document.getElementById('menuMyRoutines');
             if (menuRutinas) menuRutinas.addEventListener('click', handleRutinasClick);
             
+            // Botón "Pagar Membresía" - Tarjeta
             const btnPagar = document.getElementById('cardPayMembership');
             if (btnPagar) {
                 btnPagar.addEventListener('click', () => {
@@ -571,6 +619,7 @@
                 });
             }
             
+            // Opción del menú "Pagar Membresía"
             const menuPagar = document.getElementById('menuPayMembership');
             if (menuPagar) {
                 menuPagar.addEventListener('click', (e) => {
@@ -579,6 +628,7 @@
                 });
             }
             
+            // Botón "Mi Perfil" - Tarjeta
             const btnPerfil = document.getElementById('cardMyProfile');
             if (btnPerfil) {
                 btnPerfil.addEventListener('click', () => {
@@ -586,6 +636,7 @@
                 });
             }
             
+            // Opción del menú "Mi Perfil"
             const menuPerfil = document.getElementById('menuMyProfile');
             if (menuPerfil) {
                 menuPerfil.addEventListener('click', (e) => {
@@ -594,6 +645,7 @@
                 });
             }
             
+            // Botón "Mi Récord Personal" - Tarjeta
             const btnRecord = document.getElementById('cardMyRecord');
             if (btnRecord) {
                 btnRecord.addEventListener('click', () => {
@@ -601,6 +653,7 @@
                 });
             }
             
+            // Opción del menú "Mi Récord Personal"
             const menuRecord = document.getElementById('menuMyRecord');
             if (menuRecord) {
                 menuRecord.addEventListener('click', (e) => {
@@ -609,6 +662,7 @@
                 });
             }
             
+            // Menú desplegable del usuario
             const userBtn = document.getElementById('userBtn');
             const userDropdown = document.getElementById('userDropdown');
             
@@ -625,6 +679,7 @@
                 });
             }
             
+            // Cerrar sesión
             const logoutLink = document.getElementById('logoutLink');
             if (logoutLink) {
                 logoutLink.addEventListener('click', async (e) => {
@@ -665,8 +720,13 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                document.getElementById('dashboardContent').style.display = 'block';
-                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('loadingState').innerHTML = `
+                    <div style="color: #ff6b6b;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem;"></i>
+                        <p>Error: ${error.message}</p>
+                        <button onclick="location.reload()" style="margin-top: 20px; padding: 10px 20px; background: #FFD700; color: #000; border: none; border-radius: 5px; cursor: pointer;">Reintentar</button>
+                    </div>
+                `;
             }
         }
         
