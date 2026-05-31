@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Pagar Membresía - Jean Trainer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -167,7 +167,7 @@
         }
         .dias-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            grid-template-columns: repeat(5, 1fr);
             gap: 12px;
             margin-top: 10px;
         }
@@ -175,7 +175,7 @@
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(255, 215, 0, 0.2);
             border-radius: 12px;
-            padding: 15px 10px;
+            padding: 12px 8px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -189,16 +189,16 @@
             border-color: #FFD700;
         }
         .dia-card .meses {
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 800;
             color: #FFD700;
         }
         .dia-card .dias {
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             color: #aaa;
         }
         .dia-card .precio {
-            font-size: 1.1rem;
+            font-size: 0.85rem;
             font-weight: 700;
             color: #fff;
             margin-top: 5px;
@@ -368,11 +368,190 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* MEDIA QUERIES MEJORADAS PARA MÓVILES */
         @media (max-width: 768px) {
-            .navbar { padding: 0 20px; }
-            .container { padding: 20px; margin: 90px 20px 30px; }
-            .methods-grid { grid-template-columns: repeat(2, 1fr); }
-            .dias-grid { grid-template-columns: repeat(3, 1fr); }
+            .navbar { 
+                padding: 0 15px; 
+            }
+            .logo { 
+                font-size: 1.4rem; 
+            }
+            .back-btn { 
+                padding: 8px 18px; 
+                font-size: 0.85rem; 
+            }
+            .container { 
+                padding: 20px; 
+                margin: 90px 15px 30px; 
+            }
+            h1 { 
+                font-size: 1.6rem; 
+            }
+            .current-plan { 
+                padding: 18px; 
+            }
+            .plan-detail { 
+                flex-direction: column; 
+                align-items: flex-start; 
+                gap: 5px; 
+            }
+            .plan-label { 
+                font-size: 0.8rem; 
+            }
+            .plan-value { 
+                font-size: 1rem; 
+            }
+            
+            /* Grid de meses - 2 columnas en móvil */
+            .dias-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .dia-card {
+                padding: 10px 6px;
+            }
+            .dia-card .meses {
+                font-size: 0.9rem;
+            }
+            .dia-card .dias {
+                font-size: 0.65rem;
+            }
+            .dia-card .precio {
+                font-size: 0.8rem;
+            }
+            
+            /* Métodos de pago - 2 columnas */
+            .methods-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            .method-card {
+                padding: 10px;
+            }
+            .method-card i {
+                font-size: 1.5rem;
+            }
+            .method-card h4 {
+                font-size: 0.8rem;
+            }
+            
+            .precio-mensual span {
+                font-size: 1.4rem;
+            }
+            .resumen-box span {
+                font-size: 1.5rem;
+            }
+            .btn {
+                font-size: 1rem;
+                padding: 14px;
+            }
+            .bank-details {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Pantallas muy pequeñas (menos de 480px) */
+        @media (max-width: 480px) {
+            .container {
+                margin: 85px 10px 20px;
+                padding: 15px;
+            }
+            h1 {
+                font-size: 1.4rem;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+                margin-bottom: 20px;
+            }
+            .current-plan {
+                padding: 15px;
+                margin-bottom: 20px;
+            }
+            .current-plan h3 {
+                font-size: 1rem;
+            }
+            .dias-section {
+                padding: 15px;
+            }
+            .dias-section h4 {
+                font-size: 0.9rem;
+            }
+            .dias-grid {
+                gap: 8px;
+            }
+            .dia-card {
+                padding: 8px 4px;
+            }
+            .dia-card .meses {
+                font-size: 0.8rem;
+            }
+            .dia-card .dias {
+                font-size: 0.6rem;
+            }
+            .dia-card .precio {
+                font-size: 0.7rem;
+            }
+            .methods-grid {
+                gap: 8px;
+            }
+            .method-card {
+                padding: 8px;
+            }
+            .method-card i {
+                font-size: 1.2rem;
+                margin-bottom: 5px;
+            }
+            .method-card h4 {
+                font-size: 0.7rem;
+            }
+            .form-group {
+                margin-bottom: 15px;
+            }
+            label {
+                font-size: 0.8rem;
+            }
+            input, select {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            .precio-mensual {
+                padding: 10px;
+            }
+            .precio-mensual span {
+                font-size: 1.2rem;
+            }
+            .resumen-box {
+                padding: 15px;
+                margin: 15px 0;
+            }
+            .resumen-box span {
+                font-size: 1.3rem;
+            }
+            .btn {
+                font-size: 0.9rem;
+                padding: 12px;
+            }
+            .info-text {
+                font-size: 0.75rem;
+                padding: 8px;
+            }
+        }
+        
+        /* Pantallas muy anchas (tablet landscape) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .dias-grid {
+                grid-template-columns: repeat(5, 1fr);
+            }
+            .dia-card {
+                padding: 10px 6px;
+            }
+            .dia-card .meses {
+                font-size: 0.9rem;
+            }
+            .dia-card .precio {
+                font-size: 0.85rem;
+            }
         }
     </style>
 </head>
@@ -531,7 +710,6 @@
         
         async function obtenerPlanUsuario() {
             try {
-                // CORREGIDO: Obtener plan_nombre en lugar de tipo
                 const { data: membership, error: memError } = await supabase
                     .from('membresias')
                     .select('*, plan_nombre')
@@ -544,7 +722,6 @@
                 userMembership = membership;
                 
                 if (membership && membership.plan_nombre) {
-                    // CORREGIDO: Buscar por nombre en lugar de tipo
                     const { data: plan, error: planError } = await supabase
                         .from('catalogo_planes')
                         .select('*')
@@ -560,16 +737,13 @@
                         precioMensual = plan.precio;
                         document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> ${plan.nombre}`;
                     } else {
-                        // Si no encuentra el plan en catálogo, usa el nombre guardado
                         precioMensual = 45;
                         document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> ${membership.plan_nombre}`;
                     }
                 } else if (membership) {
-                    // Si tiene membresía pero no plan_nombre (por si acaso)
                     precioMensual = 45;
                     document.getElementById('planName').innerHTML = `<i class="fas fa-dumbbell"></i> Plan Activo`;
                 } else {
-                    // Sin membresía activa
                     precioMensual = 45;
                     document.getElementById('planName').innerHTML = '<i class="fas fa-info-circle"></i> Sin plan activo';
                 }
@@ -696,7 +870,6 @@
                         diasRestantesEl.textContent = 'Ilimitado?';
                     }
                 } else {
-                    // Sin membresía - ya se actualizó el nombre en obtenerPlanUsuario
                     fechaInicioEl.textContent = '-';
                     fechaExpiracionEl.textContent = '-';
                     planStatusEl.textContent = '📝 SIN PLAN';
