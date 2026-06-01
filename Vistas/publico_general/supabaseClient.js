@@ -1,4 +1,4 @@
-// supabaseClient.js - VERSIÓN COMPLETA CORREGIDA
+// supabaseClient.js - VERSIÓN CORREGIDA (CON CÉDULA Y TELÉFONO)
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
 
 const supabaseUrl = 'https://iketdpkxyojqxruzzrgy.supabase.co'
@@ -7,13 +7,80 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // ============================================
+// FUNCIÓN AUXILIAR: Crear usuario en tabla usuarios
+// ============================================
+async function crearUsuarioEnTabla(userId, email, nombre, apellido, cedula = null, telefono = null, rol = 'usuario') {
+  try {
+    console.log('📝 Creando usuario en tabla:', { userId, email, nombre, apellido, cedula, telefono })
+    
+    // Intentar usar la función RPC con 6 parámetros
+    const { data, error } = await supabase.rpc('crear_usuario_manual', {
+      p_id_usuario: userId,
+      p_correo: email,
+      p_nombre: nombre || email.split('@')[0],
+      p_apellido: apellido || '',
+      p_rol: rol,
+      p_cedula: cedula || null
+    })
+    
+    if (error) {
+      console.log('⚠️ Error con RPC, intentando inserción directa:', error.message)
+      
+      // Si falla RPC, usar inserción directa
+      const { error: insertError } = await supabase
+        .from('usuarios')
+        .insert({
+          id_usuario: userId,
+          correo: email,
+          nombre: nombre || email.split('@')[0],
+          apellido: apellido || '',
+          rol: rol,
+          cedula: cedula || null,
+          telefono: telefono || null,
+          created_at: new Date(),
+          updated_at: new Date()
+        })
+        .select()
+      
+      if (insertError) {
+        console.error('❌ Error en inserción directa:', insertError)
+        return false
+      }
+      
+      console.log('✅ Usuario creado con inserción directa')
+      return true
+    }
+    
+    console.log('✅ Usuario creado con RPC')
+    
+    // Si hay teléfono, actualizarlo por separado (por si acaso)
+    if (telefono) {
+      const { error: updateError } = await supabase
+        .from('usuarios')
+        .update({ telefono: telefono })
+        .eq('id_usuario', userId)
+      
+      if (updateError) {
+        console.warn('⚠️ No se pudo actualizar teléfono:', updateError)
+      } else {
+        console.log('✅ Teléfono actualizado')
+      }
+    }
+    
+    return true
+  } catch (error) {
+    console.error('❌ Error en crearUsuarioEnTabla:', error)
+    return false
+  }
+}
+
+// ============================================
 // LOGIN - CON DETECCIÓN DE ROL
 // ============================================
 export async function loginUser(email, password) {
   try {
     console.log('🔐 Intentando login:', email)
     
-    // 1. Autenticar con Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email: email,
       password: password
@@ -36,22 +103,22 @@ export async function loginUser(email, password) {
 
     console.log('✅ Usuario autenticado:', data.user.email)
     
-    // 2. Verificar si es ADMIN consultando la tabla usuarios (usando correo, no email)
     let userRole = 'usuario'
     let userName = data.user.user_metadata?.nombre || email.split('@')[0]
+    let userCedula = null
     
     try {
       console.log('🔍 Verificando rol en tabla usuarios...')
       
       const { data: userData, error: userError } = await supabase
         .from('usuarios')
-        .select('rol, nombre, apellido')
-        .eq('correo', email)  // ← CORREGIDO: usar 'correo' en lugar de 'email'
+        .select('rol, nombre, apellido, cedula')
+        .eq('correo', email)
         .maybeSingle()
       
       if (!userError && userData) {
         userRole = userData.rol || 'usuario'
-        // Si tiene nombre en la tabla, usarlo
+        userCedula = userData.cedula || null
         if (userData.nombre) {
           userName = userData.nombre
           if (userData.apellido) {
@@ -60,19 +127,18 @@ export async function loginUser(email, password) {
         }
         console.log('✅ Rol encontrado en DB:', userRole)
       } else {
-        console.log('ℹ️ Usuario no encontrado en tabla, usando rol por defecto')
-        // Si no existe en la tabla usuarios, lo creamos automáticamente
-        await crearUsuarioSiNoExiste(data.user.id, email, data.user.user_metadata?.nombre || email.split('@')[0], data.user.user_metadata?.apellido || '')
+        console.log('ℹ️ Usuario no encontrado en tabla, creándolo...')
+        await crearUsuarioEnTabla(data.user.id, email, userName, data.user.user_metadata?.apellido || '', null, null, 'usuario')
       }
     } catch (dbError) {
       console.log('⚠️ Error consultando DB:', dbError)
     }
     
-    // 3. Guardar en localStorage
     localStorage.setItem('userEmail', email)
     localStorage.setItem('userName', userName)
     localStorage.setItem('userRol', userRole)
     localStorage.setItem('userId', data.user.id)
+    if (userCedula) localStorage.setItem('userCedula', userCedula)
     
     if (data.session) {
       localStorage.setItem('supabase.auth.token', JSON.stringify(data.session))
@@ -99,45 +165,22 @@ export async function loginUser(email, password) {
 }
 
 // ============================================
-// FUNCIÓN AUXILIAR: Crear usuario en tabla usuarios si no existe
-// ============================================
-async function crearUsuarioSiNoExiste(userId, email, nombre, apellido) {
-  try {
-    const { data, error } = await supabase.rpc('crear_usuario_manual', {
-      p_id_usuario: userId,
-      p_correo: email,
-      p_nombre: nombre || email.split('@')[0],
-      p_apellido: apellido || '',
-      p_rol: 'usuario'
-    })
-    
-    if (error) {
-      console.log('⚠️ Error creando usuario:', error)
-      return false
-    }
-    
-    console.log('✅ Usuario creado en tabla usuarios')
-    return true
-  } catch (error) {
-    console.error('Error en crearUsuarioSiNoExiste:', error)
-    return false
-  }
-}
-
-// ============================================
-// REGISTRO - CORREGIDO
+// REGISTRO - CORREGIDO CON CÉDULA Y TELÉFONO
 // ============================================
 export async function registerUser(email, password, userData = {}) {
   try {
-    console.log('📝 Registrando:', email)
+    console.log('📝 Registrando usuario:', { email, userData })
     
+    // 1. Registrar en Supabase Auth
     const { data, error } = await supabase.auth.signUp({
       email: email,
       password: password,
       options: {
         data: {
           nombre: userData.nombre || email.split('@')[0],
-          apellido: userData.apellido || ''
+          apellido: userData.apellido || '',
+          cedula: userData.cedula || null,
+          telefono: userData.telefono || ''
         }
       }
     })
@@ -150,36 +193,88 @@ export async function registerUser(email, password, userData = {}) {
       }
     }
 
+    if (!data.user) {
+      return { 
+        success: false, 
+        error: 'Error al crear el usuario' 
+      }
+    }
+
     const userName = userData.nombre || email.split('@')[0]
+    const userApellido = userData.apellido || ''
+    const userCedula = userData.cedula || null
+    const userTelefono = userData.telefono || null
+
+    console.log('✅ Usuario creado en Auth, ID:', data.user.id)
     
-    // Crear usuario en la tabla usuarios usando la función RPC
-    if (data.user) {
-      await crearUsuarioSiNoExiste(data.user.id, email, userName, userData.apellido || '')
+    // 2. Crear usuario en la tabla usuarios (con cédula y teléfono)
+    const creado = await crearUsuarioEnTabla(
+      data.user.id, 
+      email, 
+      userName, 
+      userApellido, 
+      userCedula, 
+      userTelefono, 
+      'usuario'
+    )
+    
+    if (!creado) {
+      console.warn('⚠️ No se pudo crear el usuario en la tabla, pero el Auth está listo')
     }
     
-    // Guardar en localStorage (siempre usuario normal al registrarse)
+    // 3. Guardar en localStorage
     localStorage.setItem('userEmail', email)
     localStorage.setItem('userName', userName)
     localStorage.setItem('userRol', 'usuario')
-    localStorage.setItem('userId', data.user?.id || '')
+    localStorage.setItem('userId', data.user.id)
+    if (userCedula) localStorage.setItem('userCedula', userCedula)
     
-    console.log('✅ Usuario registrado:', userName)
+    console.log('✅ Registro completado:', { userName, userCedula, userTelefono })
     
     return {
       success: true,
       user: data.user,
       profile: {
-        nombre: userName
+        nombre: userName,
+        apellido: userApellido,
+        cedula: userCedula,
+        telefono: userTelefono
       },
       rol: 'usuario'
     }
 
   } catch (error) {
-    console.error('❌ Error:', error)
+    console.error('❌ Error en registerUser:', error)
     return { 
       success: false, 
-      error: 'Error inesperado' 
+      error: error.message || 'Error inesperado en el registro' 
     }
+  }
+}
+
+// ============================================
+// ACTUALIZAR PERFIL DE USUARIO
+// ============================================
+export async function updateUserProfile(userId, updates) {
+  try {
+    console.log('📝 Actualizando perfil:', { userId, updates })
+    
+    const { error } = await supabase
+      .from('usuarios')
+      .update({
+        ...updates,
+        updated_at: new Date()
+      })
+      .eq('id_usuario', userId)
+    
+    if (error) throw error
+    
+    console.log('✅ Perfil actualizado')
+    return { success: true }
+    
+  } catch (error) {
+    console.error('❌ Error actualizando perfil:', error)
+    return { success: false, error: error.message }
   }
 }
 
@@ -218,19 +313,22 @@ export async function getCurrentUser() {
       return null
     }
     
-    // Obtener rol de la tabla usuarios
     let userRole = 'usuario'
     let userName = user.email.split('@')[0]
+    let userCedula = null
+    let userTelefono = null
     
     try {
       const { data: userData } = await supabase
         .from('usuarios')
-        .select('rol, nombre, apellido')
+        .select('rol, nombre, apellido, cedula, telefono')
         .eq('correo', user.email)
         .maybeSingle()
       
       if (userData) {
         userRole = userData.rol || 'usuario'
+        userCedula = userData.cedula || null
+        userTelefono = userData.telefono || null
         if (userData.nombre) {
           userName = userData.nombre
           if (userData.apellido) {
@@ -239,14 +337,16 @@ export async function getCurrentUser() {
         }
       }
     } catch (dbError) {
-      console.log('Error obteniendo rol:', dbError)
+      console.log('Error obteniendo datos:', dbError)
     }
     
     return {
       id: user.id,
       email: user.email,
       nombre: userName,
-      rol: userRole
+      rol: userRole,
+      cedula: userCedula,
+      telefono: userTelefono
     }
     
   } catch (error) {
@@ -267,13 +367,12 @@ export async function checkSession() {
 }
 
 // ============================================
-// RECUPERAR CONTRASEÑA - CORREGIDO
+// RECUPERAR CONTRASEÑA
 // ============================================
 export async function resetPassword(email, redirectUrl = null) {
   try {
     console.log('📧 Enviando recuperación a:', email)
     
-    // Usar la URL actual del navegador
     const baseUrl = window.location.origin
     const resetPage = redirectUrl || `${baseUrl}/restablecer.html`
     
@@ -286,7 +385,6 @@ export async function resetPassword(email, redirectUrl = null) {
     if (error) {
       console.error('❌ Error detallado:', error)
       
-      // Mensajes de error más amigables
       if (error.message.includes('rate limit')) {
         return { 
           success: false, 
@@ -301,14 +399,6 @@ export async function resetPassword(email, redirectUrl = null) {
         }
       }
       
-      if (error.message.includes('Email not confirmed')) {
-        return { 
-          success: false, 
-          error: 'Debes confirmar tu email primero. Revisa tu bandeja de entrada.' 
-        }
-      }
-      
-      // Error 500 - Problema con el proveedor de email
       if (error.status === 500 || error.message.includes('Error sending recovery email')) {
         return { 
           success: false, 
