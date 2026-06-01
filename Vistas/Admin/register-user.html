@@ -299,9 +299,8 @@
             }
         }
     </style>
-    <!-- Importar Supabase - RUTA CORREGIDA -->
+    <!-- Importar Supabase -->
     <script type="module">
-        // Importación desde publico_general
         import { supabase } from '../publico_general/supabaseClient.js';
         window.supabase = supabase;
     </script>
@@ -351,6 +350,16 @@
                             </label>
                             <input type="text" id="lastName" name="lastName" required>
                             <small>Apellido del usuario</small>
+                        </div>
+
+                        <!-- NUEVO CAMPO: CÉDULA -->
+                        <div class="form-group">
+                            <label for="cedula">
+                                <i class="fas fa-id-card"></i>
+                                Cédula
+                            </label>
+                            <input type="text" id="cedula" name="cedula" placeholder="Ej: 12345678">
+                            <small>Número de identificación (opcional pero único)</small>
                         </div>
                         
                         <div class="form-group required">
@@ -487,13 +496,13 @@
                             <select id="bloodType" name="bloodType">
                                 <option value="">Seleccionar</option>
                                 <option value="A+">A+</option>
-                                <option value="A">A-</option>
+                                <option value="A-">A-</option>
                                 <option value="B+">B+</option>
-                                <option value="B">B-</option>
+                                <option value="B-">B-</option>
                                 <option value="AB+">AB+</option>
-                                <option value="AB">AB-</option>
+                                <option value="AB-">AB-</option>
                                 <option value="O+">O+</option>
-                                <option value="O">O-</option>
+                                <option value="O-">O-</option>
                             </select>
                         </div>
                     </div>
@@ -518,7 +527,6 @@
         // Inicializar cuando el DOM esté cargado
         document.addEventListener('DOMContentLoaded', async function() {
             try {
-                // Importar Supabase desde publico_general - RUTA CORREGIDA
                 const module = await import('../publico_general/supabaseClient.js');
                 supabaseClient = module.supabase;
                 
@@ -526,14 +534,12 @@
                     throw new Error('No se pudo cargar Supabase');
                 }
                 
-                // Verificar que el usuario sea admin
                 const { data: { user } } = await supabaseClient.auth.getUser();
                 if (!user) {
                     window.location.href = '../publico_general/login.html';
                     return;
                 }
                 
-                // Verificar si es admin
                 const { data: profile } = await supabaseClient
                     .from('usuarios')
                     .select('rol')
@@ -550,7 +556,6 @@
             }
         });
 
-        // Mostrar mensajes
         function showMessage(text, type = 'success') {
             const messageDiv = document.getElementById('message');
             messageDiv.textContent = text;
@@ -563,7 +568,6 @@
             }
         }
 
-        // Resetear formulario
         function resetForm() {
             if (confirm('¿Estás seguro de limpiar todo el formulario?')) {
                 document.getElementById('userForm').reset();
@@ -571,13 +575,12 @@
             }
         }
 
-        // Validar formulario
         document.getElementById('userForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Obtener valores
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
+            const cedula = document.getElementById('cedula').value.trim();
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const password = document.getElementById('password').value;
@@ -589,7 +592,6 @@
             const gender = document.getElementById('gender').value;
             const bloodType = document.getElementById('bloodType').value;
             
-            // Validaciones
             if (!firstName || !lastName || !email || !password || !confirmPassword || !userRole) {
                 showMessage('Todos los campos obligatorios deben ser completados', 'error');
                 return;
@@ -605,21 +607,18 @@
                 return;
             }
             
-            // Validar email
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 showMessage('Email inválido', 'error');
                 return;
             }
             
-            // Mostrar carga
             const submitBtn = e.target.querySelector('button[type="submit"]');
             const originalText = submitBtn.innerHTML;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registrando...';
             submitBtn.disabled = true;
             
             try {
-                // 1. Registrar en Supabase Auth
                 const { data: authData, error: authError } = await supabaseClient.auth.signUp({
                     email: email,
                     password: password,
@@ -634,19 +633,19 @@
                 
                 if (authError) throw authError;
                 
-                // 2. Crear usuario en tabla usuarios
                 if (authData.user) {
+                    // 🔧 USAR LA FUNCIÓN CON 6 PARÁMETROS (INCLUYENDO CÉDULA)
                     const { data: dbData, error: dbError } = await supabaseClient.rpc('crear_usuario_manual', {
                         p_id_usuario: authData.user.id,
                         p_correo: email,
                         p_nombre: firstName,
                         p_apellido: lastName,
-                        p_rol: userRole
+                        p_rol: userRole,
+                        p_cedula: cedula || null  // ← CÉDULA AGREGADA
                     });
                     
                     if (dbError) throw dbError;
                     
-                    // 3. Actualizar información adicional si existe
                     const updates = {};
                     if (phone) updates.telefono = phone;
                     if (age) updates.edad = parseInt(age);
@@ -661,7 +660,6 @@
                             .eq('id_usuario', authData.user.id);
                     }
                     
-                    // 4. Crear membresía si se seleccionó
                     if (membershipType) {
                         const fechaSiguientePago = new Date();
                         fechaSiguientePago.setMonth(fechaSiguientePago.getMonth() + 1);
@@ -670,15 +668,14 @@
                             .from('membresias')
                             .insert({
                                 id_usuario: authData.user.id,
-                                tipo: membershipType,
+                                plan_nombre: membershipType,
                                 fecha_siguiente_pago: fechaSiguientePago.toISOString().split('T')[0],
                                 estado: 'activo'
                             });
                     }
                     
-                    showMessage(`✅ Usuario "${firstName} ${lastName}" registrado exitosamente con rol: ${userRole}`, 'success');
+                    showMessage(`✅ Usuario "${firstName} ${lastName}" registrado exitosamente con rol: ${userRole}${cedula ? ` (Cédula: ${cedula})` : ''}`, 'success');
                     
-                    // Resetear formulario después de 2 segundos
                     setTimeout(() => {
                         document.getElementById('userForm').reset();
                     }, 2000);
@@ -688,7 +685,6 @@
                 console.error('Error registrando usuario:', error);
                 showMessage(`❌ Error: ${error.message}`, 'error');
             } finally {
-                // Restaurar botón
                 submitBtn.innerHTML = originalText;
                 submitBtn.disabled = false;
             }
