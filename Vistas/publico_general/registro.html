@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vaquero Entrenador - Registro</title>
+    <title>Athlex - Registro</title>
     <style>
         * {
             margin: 0;
@@ -144,6 +144,13 @@
             font-size: 12px;
             color: #FFD700;
             font-weight: 600;
+        }
+        
+        /* Campo requerido con asterisco */
+        .form-group.required label::after {
+            content: " *";
+            color: #ff4444;
+            font-size: 14px;
         }
         
         .btn-register {
@@ -299,22 +306,30 @@
             
             <form id="registerForm">
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group required">
                         <input type="text" id="nombre" name="nombre" placeholder=" " required>
                         <label for="nombre">
                             <i class="fas fa-user"></i> Nombre
                         </label>
                     </div>
                     
-                    <div class="form-group">
-                        <input type="text" id="apellido" name="apellido" placeholder=" ">
+                    <div class="form-group required">
+                        <input type="text" id="apellido" name="apellido" placeholder=" " required>
                         <label for="apellido">
                             <i class="fas fa-user"></i> Apellido
                         </label>
                     </div>
                 </div>
                 
-                <div class="form-group full-width">
+                <!-- CAMPO CÉDULA - OBLIGATORIO -->
+                <div class="form-group full-width required">
+                    <input type="text" id="cedula" name="cedula" placeholder=" " required>
+                    <label for="cedula">
+                        <i class="fas fa-id-card"></i> Cédula
+                    </label>
+                </div>
+                
+                <div class="form-group full-width required">
                     <input type="email" id="email" name="email" placeholder=" " required>
                     <label for="email">
                         <i class="fas fa-envelope"></i> Email
@@ -322,7 +337,7 @@
                 </div>
                 
                 <div class="form-row">
-                    <div class="form-group">
+                    <div class="form-group required">
                         <input type="password" id="password" name="password" placeholder=" " required>
                         <label for="password">
                             <i class="fas fa-lock"></i> Contraseña
@@ -333,7 +348,7 @@
                         </div>
                     </div>
                     
-                    <div class="form-group">
+                    <div class="form-group required">
                         <input type="password" id="confirmPassword" name="confirmPassword" placeholder=" " required>
                         <label for="confirmPassword">
                             <i class="fas fa-lock"></i> Confirmar
@@ -454,12 +469,20 @@
     
     confirmInput.addEventListener('input', checkPasswordMatch);
     
+    // Validar formato de cédula venezolana (opcional)
+    function validateVenezuelanCedula(cedula) {
+        // Solo números, entre 6 y 8 dígitos
+        const cedulaRegex = /^[0-9]{6,8}$/;
+        return cedulaRegex.test(cedula);
+    }
+    
     // Envío del formulario
     document.getElementById('registerForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const nombre = document.getElementById('nombre').value.trim();
         const apellido = document.getElementById('apellido').value.trim();
+        const cedula = document.getElementById('cedula').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value;
         const confirmPassword = document.getElementById('confirmPassword').value;
@@ -468,6 +491,22 @@
         // Validaciones
         if (!nombre) {
             showMessage('Por favor, ingresa tu nombre', 'error');
+            return;
+        }
+        
+        if (!apellido) {
+            showMessage('Por favor, ingresa tu apellido', 'error');
+            return;
+        }
+        
+        if (!cedula) {
+            showMessage('Por favor, ingresa tu número de cédula', 'error');
+            return;
+        }
+        
+        // Validar formato de cédula (solo números, 6-8 dígitos)
+        if (!validateVenezuelanCedula(cedula)) {
+            showMessage('La cédula debe contener solo números (6 a 8 dígitos)', 'error');
             return;
         }
         
@@ -506,10 +545,11 @@
             const userData = {
                 nombre: nombre,
                 apellido: apellido,
+                cedula: cedula,
                 telefono: telefono
             };
             
-            console.log('📝 Registrando usuario:', { email, nombre, apellido });
+            console.log('📝 Registrando usuario:', { email, nombre, apellido, cedula });
             
             const result = await registerUser(email, password, userData);
             
@@ -519,6 +559,8 @@
                     errorMsg = 'Este email ya está registrado. ¿Quieres iniciar sesión?';
                 } else if (errorMsg.includes('password')) {
                     errorMsg = 'La contraseña debe tener al menos 6 caracteres';
+                } else if (errorMsg.includes('cedula') || errorMsg.includes('Cédula') || errorMsg.includes('duplicate key')) {
+                    errorMsg = 'La cédula ingresada ya está registrada en el sistema';
                 }
                 showMessage(errorMsg, 'error');
                 submitBtn.innerHTML = originalHTML;
@@ -531,6 +573,7 @@
             // Guardar información adicional en localStorage
             localStorage.setItem('userName', nombre);
             localStorage.setItem('userEmail', email);
+            localStorage.setItem('userCedula', cedula);
             
             // Redirigir después de 1.5 segundos
             setTimeout(() => {
