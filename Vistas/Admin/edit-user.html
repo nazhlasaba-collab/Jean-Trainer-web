@@ -125,6 +125,13 @@
             border-color: #FFD700;
         }
 
+        .form-group input:disabled, .form-group input.readonly {
+            background: rgba(255, 255, 255, 0.05);
+            color: #aaa;
+            cursor: not-allowed;
+            border-color: rgba(255, 215, 0, 0.3);
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -194,6 +201,28 @@
             display: block;
         }
 
+        .message.info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196F3;
+            color: #2196F3;
+            display: block;
+        }
+
+        .info-note {
+            background: rgba(255, 215, 0, 0.1);
+            border-left: 4px solid #FFD700;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #ccc;
+        }
+
+        .info-note i {
+            color: #FFD700;
+            margin-right: 8px;
+        }
+
         @media (max-width: 768px) {
             .form-row {
                 grid-template-columns: 1fr;
@@ -216,25 +245,40 @@
         <h1 class="page-title">EDITAR USUARIO</h1>
         <div class="form-container">
             <div id="message" class="message"></div>
+            
+            <div class="info-note">
+                <i class="fas fa-info-circle"></i> La cédula es un dato único y no se puede modificar por seguridad.
+            </div>
+            
             <form id="editUserForm">
                 <div class="form-row">
                     <div class="form-group">
-                        <label><i class="fas fa-user"></i> Nombre</label>
+                        <label><i class="fas fa-user"></i> Nombre *</label>
                         <input type="text" id="nombre" required>
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-user"></i> Apellido</label>
+                        <label><i class="fas fa-user"></i> Apellido *</label>
                         <input type="text" id="apellido" required>
                     </div>
                 </div>
+
+                <!-- CAMPO CÉDULA - SOLO LECTURA (NO SE PUEDE EDITAR) -->
                 <div class="form-group">
-                    <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                    <label><i class="fas fa-id-card"></i> Cédula</label>
+                    <input type="text" id="cedula" class="readonly" readonly disabled>
+                    <small style="color: #aaa;">La cédula no se puede modificar (identificador único)</small>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> Correo Electrónico *</label>
                     <input type="email" id="correo" required>
                 </div>
+
                 <div class="form-group">
                     <label><i class="fas fa-phone"></i> Teléfono</label>
                     <input type="tel" id="telefono">
                 </div>
+
                 <div class="form-group">
                     <label><i class="fas fa-user-tag"></i> Rol</label>
                     <select id="rol">
@@ -243,6 +287,7 @@
                         <option value="admin">Administrador</option>
                     </select>
                 </div>
+
                 <div class="form-group">
                     <label><i class="fas fa-venus-mars"></i> Género</label>
                     <select id="genero">
@@ -252,6 +297,7 @@
                         <option value="otro">Otro</option>
                     </select>
                 </div>
+
                 <div class="form-row">
                     <div class="form-group">
                         <label><i class="fas fa-weight-scale"></i> Peso (kg)</label>
@@ -262,6 +308,12 @@
                         <input type="number" id="estatura" step="0.1" min="100" max="250">
                     </div>
                 </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-calendar-alt"></i> Fecha de Registro</label>
+                    <input type="text" id="created_at" disabled style="background: rgba(255,255,255,0.05);">
+                </div>
+
                 <div class="actions-container">
                     <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Guardar Cambios</button>
                     <button type="button" class="btn-secondary" onclick="window.location.href='view-user.html'"><i class="fas fa-times"></i> Cancelar</button>
@@ -290,22 +342,34 @@
         
         async function cargarUsuario() {
             try {
+                mostrarMensaje('Cargando datos del usuario...', 'info');
+                
+                // Consulta directa a la tabla usuarios
                 const { data: user, error } = await supabase
                     .from('usuarios')
                     .select('*')
                     .eq('id_usuario', userId)
                     .single();
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Error en consulta:', error);
+                    throw error;
+                }
                 
                 if (!user) {
                     mostrarMensaje('Usuario no encontrado', 'error');
                     return;
                 }
                 
+                console.log('Usuario cargado:', user);
+                
                 // Llenar formulario
                 document.getElementById('nombre').value = user.nombre || '';
                 document.getElementById('apellido').value = user.apellido || '';
+                
+                // MOSTRAR CÉDULA (campo de solo lectura)
+                document.getElementById('cedula').value = user.cedula || 'No registrada';
+                
                 document.getElementById('correo').value = user.correo || '';
                 document.getElementById('telefono').value = user.telefono || '';
                 document.getElementById('rol').value = user.rol || 'usuario';
@@ -313,9 +377,23 @@
                 document.getElementById('peso').value = user.peso || '';
                 document.getElementById('estatura').value = user.estatura || '';
                 
+                // Mostrar fecha de registro (solo lectura)
+                if (user.created_at) {
+                    const fecha = new Date(user.created_at).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    document.getElementById('created_at').value = fecha;
+                }
+                
+                mostrarMensaje('✅ Datos cargados correctamente', 'success');
+                
             } catch (error) {
                 console.error('Error cargando usuario:', error);
-                mostrarMensaje('Error al cargar los datos del usuario', 'error');
+                mostrarMensaje('Error al cargar los datos del usuario: ' + error.message, 'error');
             }
         }
         
@@ -323,18 +401,34 @@
             e.preventDefault();
             
             const updates = {
-                nombre: document.getElementById('nombre').value,
-                apellido: document.getElementById('apellido').value,
-                correo: document.getElementById('correo').value,
-                telefono: document.getElementById('telefono').value,
+                nombre: document.getElementById('nombre').value.trim(),
+                apellido: document.getElementById('apellido').value.trim(),
+                // NOTA: NO incluimos cedula aquí porque no se puede modificar
+                correo: document.getElementById('correo').value.trim(),
+                telefono: document.getElementById('telefono').value.trim() || null,
                 rol: document.getElementById('rol').value,
-                genero: document.getElementById('genero').value,
-                peso: parseFloat(document.getElementById('peso').value) || null,
-                estatura: parseFloat(document.getElementById('estatura').value) || null,
+                genero: document.getElementById('genero').value || null,
+                peso: document.getElementById('peso').value ? parseFloat(document.getElementById('peso').value) : null,
+                estatura: document.getElementById('estatura').value ? parseFloat(document.getElementById('estatura').value) : null,
                 updated_at: new Date()
             };
             
+            // Validar campos requeridos
+            if (!updates.nombre || !updates.apellido || !updates.correo) {
+                mostrarMensaje('Nombre, apellido y correo son obligatorios', 'error');
+                return;
+            }
+            
+            // Validar formato de email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(updates.correo)) {
+                mostrarMensaje('El correo electrónico no es válido', 'error');
+                return;
+            }
+            
             try {
+                mostrarMensaje('Guardando cambios...', 'info');
+                
                 const { error } = await supabase
                     .from('usuarios')
                     .update(updates)
@@ -358,6 +452,7 @@
             const msgDiv = document.getElementById('message');
             msgDiv.textContent = mensaje;
             msgDiv.className = `message ${tipo}`;
+            
             setTimeout(() => {
                 msgDiv.style.display = 'none';
             }, 3000);
